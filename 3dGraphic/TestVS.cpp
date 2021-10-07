@@ -6,10 +6,10 @@ void* TestVS::Execute(void* vertexBuffer, int vertexOffeset)
 }
 
 
-Output* TestVS::main(Input input)
+TestVS::Output* TestVS::main(Input input)
 {
 	Output output;
-	output.pos = input.pos * 2;
+	output.pos = float3{ input.pos.x * 20, input.pos.y * 20, input.pos.z };
 	output.color = input.color;
 
 	return &output;

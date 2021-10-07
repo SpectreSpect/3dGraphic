@@ -147,12 +147,17 @@
     <ClInclude Include="MyDirectX\Device.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Math\float4.h" />
+    <ClInclude Include="MyDirectX\DXGI_FORMAT.h" />
     <ClInclude Include="MyDirectX\ViewPort.h" />
+    <ClInclude Include="MyDirectX\PixelShader.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="MyDirectX\SwapChain.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="MyDirectX\VertexBuffer.h" />
     <ClInclude Include="MyDirectX\VertexShader.h" />
+    <ClInclude Include="TestPS.h" />
     <ClInclude Include="TestVS.h" />
+    <ClInclude Include="MyDirectX\Texture2D.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="3dGraphic.cpp" />
@@ -160,7 +165,11 @@
     <ClCompile Include="MyDirectX\Device.cpp" />
     <ClCompile Include="MyDirectX\VertexBuffer.cpp" />
     <ClCompile Include="MyDirectX\VertexShader.cpp" />
+    <ClCompile Include="MyDirectX\PixelShader.cpp" />
+    <ClCompile Include="MyDirectX\SwapChain.cpp" />
+    <ClCompile Include="TestPS.cpp" />
     <ClCompile Include="TestVS.cpp" />
+    <ClCompile Include="MyDirectX\Texture2D.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="3dGraphic.rc" />

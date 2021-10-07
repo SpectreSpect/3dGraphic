@@ -7,6 +7,7 @@
 #include "MyDirectX/Device.h"
 
 #include "TestVS.h"
+#include "TestPS.h"
 
 #define MAX_LOADSTRING 100
 #define VIDEOCASHMEMORYSIZE 100000000
@@ -15,6 +16,7 @@ HINSTANCE hInst;
 WCHAR szTitle[MAX_LOADSTRING];
 WCHAR szWindowClass[MAX_LOADSTRING];
 Device* device;
+SwapChain* swapChain;
 
 // Отправить объявления функций, включенных в этот модуль кода:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -44,6 +46,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     }
 
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_MY3DGRAPHIC));
+    
+
 
     MSG msg;
 
@@ -100,7 +104,8 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 //
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
-    device = new Device(VIDEOCASHMEMORYSIZE);
+
+
    hInst = hInstance; // Сохранить маркер экземпляра в глобальной переменной
 
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
@@ -113,6 +118,10 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
+
+
+
+
 
    return TRUE;
 }
@@ -190,11 +199,23 @@ void func()
 
 TestVS testVS;
 VertexBuffer vertexBuffer;
+TestPS testPS;
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
+    case WM_CREATE:
+    {
+        RECT clientRect{};
+        GetClientRect(hWnd, &clientRect);
+
+        float width = clientRect.right - clientRect.left;
+        float height = clientRect.bottom - clientRect.top;
+
+        device = new Device(VIDEOCASHMEMORYSIZE);
+        device->CreateSwapChain(&swapChain, 2, float2{ width, height }, DXGI_FORMAT_R32G32B32A32_FLOAT);
+    }
     case WM_COMMAND:
         {
             int wmId = LOWORD(wParam);
@@ -243,8 +264,50 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             device->SetViewPort(viewPort);
             device->SetVertexBuffer(&vertexBuffer);
             device->SetVertexShader(&testVS);
+            device->SetPixelShader(&testPS);
             
             device->Draw(3);
+
+            swapChain->Prevent();
+            
+            //for (float x = 0; x < width; x++)
+            //    for (float y = 0; y < height; y++)
+            //    {
+            //        float colorX = swapChain->backBuffers[swapChain->frontBufferId].texture2D;
+
+            //        swapChain->backBuffers[1].texture2D
+            //        //SetPixel(hdc, x, y, RGB((int)color.x, (int)color.y, (int)color.z));
+            //    }
+
+
+            //for (int i = 0; i < verticesCount; i += 3)
+            //    for (int x = viewPort.left; x <= viewPort.right; x++)
+            //        for (int y = viewPort.top; y <= viewPort.bottom; y++)
+            //        {
+            //            float2 pixelPos = float2{ (x / width) * 2 - 1, ((height - y) / height) * 2 - 1 };
+            //            //memcpy(swapChain->backBuffers[swapChain->currentBackBufferId].texture2D[x][y * swapChain->backBuffers->format], );
+            //            memcpy((char*)swapChain->backBuffers[swapChain->currentBackBufferId].texture2D[x] + (y * swapChain->backBuffers->format), &DrawTriangle(pixelPos, i), swapChain->backBuffers->format);
+            //        }
+
+            for (int x = viewPort.left; x < viewPort.right; x++)
+                for (int y = viewPort.top; y < viewPort.bottom; y++)
+                {
+                    if (x == viewPort.right)
+                        int point = 0;
+                    float3 color{};
+                    color.x = *(float*)((char*)device->swapChain->backBuffers[swapChain->frontBufferId].texture2D[x] + (y * swapChain->backBuffers->format));
+                    color.y = *(float*)((char*)device->swapChain->backBuffers[swapChain->frontBufferId].texture2D[x] + (y * swapChain->backBuffers->format) + swapChain->backBuffers->format);
+                    color.z = *(float*)((char*)device->swapChain->backBuffers[swapChain->frontBufferId].texture2D[x] + (y * swapChain->backBuffers->format) + 2 * swapChain->backBuffers->format);
+
+                    if (color.x <= 0) color.x = 0;
+                    if (color.y <= 0) color.y = 0;
+                    if (color.z <= 0) color.z = 0;
+
+                    color.x *= 255;
+                    color.y *= 255;
+                    color.z *= 255;
+                    SetPixel(hdc, x, y, RGB((int)color.x, (int)color.y, (int)color.z));
+                }
 
 
             //for(float x = 0; x < width; x++)

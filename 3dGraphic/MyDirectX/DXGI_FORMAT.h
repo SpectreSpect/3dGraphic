@@ -1,0 +1,6 @@
+#pragma once
+
+enum DXGI_FORMAT
+{
+	DXGI_FORMAT_R32G32B32A32_FLOAT = 16
+};

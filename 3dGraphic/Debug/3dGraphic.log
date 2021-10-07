@@ -1,3 +1,4 @@
-﻿  TestVS.cpp
-E:\VisualStudioProjects\3dGraphic\3dGraphic\TestVS.cpp(15): warning C4172: возвращение адреса локальной или временной переменной : output
+﻿  Device.cpp
+E:\VisualStudioProjects\3dGraphic\3dGraphic\MyDirectX\Device.cpp(131,21): warning C4244: инициализация: преобразование "int" в "float", возможна потеря данных
+E:\VisualStudioProjects\3dGraphic\3dGraphic\MyDirectX\Device.cpp(132,22): warning C4244: инициализация: преобразование "int" в "float", возможна потеря данных
   3dGraphic.vcxproj -> E:\VisualStudioProjects\3dGraphic\Debug\3dGraphic.exe
