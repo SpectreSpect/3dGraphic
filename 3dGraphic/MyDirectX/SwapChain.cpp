@@ -5,14 +5,8 @@ void SwapChain::CreateBackBuffers(float2 size, DXGI_FORMAT format, int backBuffe
 	backBuffers = new Texture2D[backBuffersCount];
 	
 	for (int i = 0; i < backBuffersCount; i++)
-	{
-		backBuffers[i].format = format;
-		backBuffers[i].size = size;
-		
-		backBuffers[i].texture2D = new void*[size.x];
-		for (int j = 0; j < size.x; j++)
-			backBuffers[i].texture2D[j] = new char[size.y * format];
-	}
+		backBuffers[i].InitTexture2D(format, size);
+
 	frontBufferId = 0;
 	currentBackBufferId = 1;
 }

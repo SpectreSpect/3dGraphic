@@ -7,10 +7,16 @@
 #include "SwapChain.h"
 #include "Input_Layout.h"
 
-#define NONE -23564343
+#define NONE -228
+#define BIG_NUM 999999999999
 class Device
 {
 public:
+	struct VERTEX
+	{
+		float3 pos;
+		float4 color;
+	};
 	Device(size_t videoHashMemorySize);
 	void SetVertexBuffer(VertexBuffer* vertexBuffer);
 	void SetVertexShader(VertexShader* vertexShader);
@@ -18,7 +24,9 @@ public:
 	void SetViewPort(ViewPort viewPort);
 	void SetInputLayout(Input_Layout* inputLayout);
 	void CreateSwapChain(SwapChain** swapChain, int backBuffersCount, float2 backBuffersSize, DXGI_FORMAT format);
+	void SetDepthStencil(Texture2D* depthStencil);
 	void Draw(int verticesCount);
+	void ClearBuffer(float4 color, Texture2D* texture);
 	SwapChain** swapChain;
 private:
 	VertexShader* vs;
@@ -27,6 +35,7 @@ private:
 	VertexBuffer* vertexBuffer;
 	VertexBuffer changedVertexBuffer;
 	Input_Layout* inputLayout;
+	Texture2D* depthStencil;
 
 	void* backBuffers;
 	void* videoHashMemory;
@@ -34,7 +43,10 @@ private:
 
 
 	//float4 DrawTriangle(float2 pixelPos, float3 A, float3 B, float3 C);
+	float3 GetUVZ(float2 pixelPos, int firstVertexID);
 	float4 DrawTriangle(float2 pixelPos, int firstVertexID);
+	float4 DrawTriangle(float2 pixelPos, int firstVertexID, float3 uvz);
+	void FillDepthStencil();
 	void ExecuteVertexShader();
 	//float4 DrawTriangle(float2 pixelPos);
 };

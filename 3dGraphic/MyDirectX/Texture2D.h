@@ -4,6 +4,7 @@
 class Texture2D
 {
 public:
+	void InitTexture2D(int format, float2 size);
 	void** texture2D;
 	int format;
 	float2 size;

@@ -202,11 +202,13 @@ TestVS testVS;
 VertexBuffer vertexBuffer;
 TestPS testPS;
 Input_Layout inputLayout;
+Texture2D depthStencil;
 
 struct VERTEX
 {
     float3 pos;
     float4 color;
+    float3 normal;
 };
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -228,18 +230,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         //{
         //  {"POSITION", DXGI_FORMAT_R32G32B32A32_FLOAT, 0}
         //};
-        Attribute* attribute = new Attribute[2];
-
-        char* semantic = (char*)"POSITION";
+        Attribute* attribute = new Attribute[3];
 
         attribute[0] = { (char*)"POSITION", DXGI_FORMAT_R32G32B32_FLOAT, 0 };
-        attribute[1] = { (char*)"COLOR", DXGI_FORMAT_R32G32B32A32_FLOAT, DXGI_FORMAT_R32G32B32_FLOAT };
+        attribute[1] = { (char*)"COLOR", DXGI_FORMAT_R32G32B32A32_FLOAT, 12 };
+        attribute[2] = { (char*)"NORMAL", DXGI_FORMAT_R32G32B32_FLOAT, 28 };
+
 
         inputLayout.attributeBuffer = attribute;
-        //inputLayout.elementsCount = sizeof(attribute) / sizeof(Attribute);
-        inputLayout.elementsCount = 2;
+        inputLayout.elementsCount = 3;
 
         device->SetInputLayout(&inputLayout);
+
+        depthStencil.InitTexture2D(DXGI_FORMAT_R32G32B32A32_FLOAT, float2{ width, height });
     }
     case WM_COMMAND:
         {
@@ -275,69 +278,240 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             viewPort.right = clientRect.right;       
             viewPort.bottom = clientRect.bottom;
 
-            //float3 verticesPos[] =
-            //{
-            //    -1, -1, 3,  1, 1, 1, 1,
-            //    0, 1, 1,    0, 1, 0, 1,
-            //    1, -1, 1,   0, 0, 1, 1
-            //};
-
-            
-
+            float3 pos = {3, -4, 8};
+            float3 pos2 = {2, -3, 9};
+            float flatSize = 200;
+            float3 flatPos = { 0, -5, flatSize  };
+            float4 flatColor = { 120 / 255.f, 255 / 255.0f, 129 / 255.0f, 1};
             VERTEX verticesPos[] =
             {
-                -1, -1, 3,  1, 1, 1, 1,
-                0, 1, 1,    0, 1, 0, 1,
-                1, -1, 1,   0, 0, 1, 1
+                //bottom
+                -1 + pos.x, -1 + pos.y, -1 + pos.z,  1, 1, 1, 1,    0, -1, 0,
+                -1 + pos.x, -1 + pos.y, 1 + pos.z,  1, 1, 1, 1,     0, -1, 0,
+                1 + pos.x, -1 + pos.y, -1 + pos.z,  1, 1, 1, 1,     0, -1, 0,
+
+
+                1 + pos.x, -1 + pos.y, -1 + pos.z,  1, 1, 1, 1,     0, -1, 0,
+                1 + pos.x, -1 + pos.y, 1 + pos.z,  1, 1, 1, 1,      0, -1, 0,
+                -1 + pos.x, -1 + pos.y, 1 + pos.z,  1, 1, 1, 1,     0, -1, 0,
+
+                // //left
+                 -1 + pos.x, -1 + pos.y, 1 + pos.z,  1, 1, 1, 1,     -1, 0, 0,
+                 -1 + pos.x, 1 + pos.y, 1 + pos.z,  1, 1, 1, 1,      -1, 0, 0,
+                 -1 + pos.x, 1 + pos.y, -1 + pos.z,  1, 1, 1, 1,     -1, 0, 0,
+
+                 -1 + pos.x, 1 + pos.y, -1 + pos.z,  1, 1, 1, 1,     -1, 0, 0,
+                 -1 + pos.x, -1 + pos.y, -1 + pos.z,  1, 1, 1, 1,    -1, 0, 0,
+                 -1 + pos.x, -1 + pos.y, 1 + pos.z,  1, 1, 1, 1,     -1, 0, 0,
+
+                 // //back
+                  -1 + pos.x, -1 + pos.y, 1 + pos.z,  1, 1, 1, 1,      0, 0, 1,
+                  -1 + pos.x, 1 + pos.y, 1 + pos.z,  1, 1, 1, 1,       0, 0, 1,
+                  1 + pos.x, 1 + pos.y, 1 + pos.z,  1, 1, 1, 1,        0, 0, 1,
+
+                  1 + pos.x, 1 + pos.y, 1 + pos.z,  1, 1, 1, 1,        0, 0, 1,
+                  -1 + pos.x, -1 + pos.y, 1 + pos.z,  1, 1, 1, 1,      0, 0, 1,
+                  1 + pos.x, -1 + pos.y, 1 + pos.z,  1, 1, 1, 1,       0, 0, 1,
+
+                  // //right
+                   1 + pos.x, -1 + pos.y, 1 + pos.z,  1, 1, 1, 1,      1, 0, 0,
+                   1 + pos.x, -1 + pos.y, -1 + pos.z,  1, 1, 1, 1,     1, 0, 0,
+                   1 + pos.x, 1 + pos.y, -1 + pos.z,  1, 1, 1, 1,      1, 0, 0,
+
+                   1 + pos.x, 1 + pos.y, -1 + pos.z,  1, 1, 1, 1,      1, 0, 0,
+                   1 + pos.x, -1 + pos.y, 1 + pos.z,  1, 1, 1, 1,      1, 0, 0,
+                   1 + pos.x, 1 + pos.y, 1 + pos.z,  1, 1, 1, 1,       1, 0, 0,
+
+                   // //top
+                    1 + pos.x, 1 + pos.y, 1 + pos.z,  1, 1, 1, 1, 0, 1, 0,
+                    -1 + pos.x, 1 + pos.y, 1 + pos.z,  1, 1, 1, 1, 0, 1, 0,
+                    -1 + pos.x, 1 + pos.y, -1 + pos.z,  1, 1, 1, 1, 0, 1, 0,
+
+                   -1 + pos.x, 1 + pos.y, -1 + pos.z,  1, 1, 1, 1, 0, 1, 0,
+                   1 + pos.x, 1 + pos.y, 1 + pos.z,  1, 1, 1, 1, 0, 1, 0,
+                   1 + pos.x, 1 + pos.y, -1 + pos.z,  1, 1, 1, 1, 0, 1, 0,
+
+                   ////front
+                   1 + pos.x, 1 + pos.y, -1 + pos.z,  1, 1, 1, 1, 0, 0, -1,
+                   -1 + pos.x, 1 + pos.y, -1 + pos.z,  1, 1, 1, 1,  0, 0, -1,
+                   -1 + pos.x, -1 + pos.y, -1 + pos.z,  1, 1, 1, 1,  0, 0, -1,
+
+                   -1 + pos.x, -1 + pos.y, -1 + pos.z,  1, 1, 1, 1,  0, 0, -1,
+                   1 + pos.x, -1 + pos.y, -1 + pos.z,  1, 1, 1, 1,  0, 0, -1,
+                   1 + pos.x, 1 + pos.y, -1 + pos.z,  1, 1, 1, 1,  0, 0, -1,
+
+
+                   //1 + pos.x, 3 + pos.y, -1 + pos.z,  1, 1, 1, 1,  0, 0, -1,
+                   //1 + pos.x, 3 + pos.y, -2 + pos.z,  1, 1, 1, 1,  0, 0, -1,
+                   //-1 + pos.x, 3 + pos.y, -1 + pos.z,  1, 1, 1, 1,  0, 0, -1,
+
+
+                    // //bottom
+                    -1 + pos2.x, -1 + pos2.y, -1 + pos2.z,  1, 1, 1, 1,    0, -1, 0,
+                    -1 + pos2.x, -1 + pos2.y, 1 + pos2.z,  1, 1, 1, 1,     0, -1, 0,
+                    1 + pos2.x, -1 + pos2.y, -1 + pos2.z,  1, 1, 1, 1,     0, -1, 0,
+
+
+                    1 + pos2.x, -1 + pos2.y, -1 + pos2.z,  1, 1, 1, 1,     0, -1, 0,
+                    1 + pos2.x, -1 + pos2.y, 1 + pos2.z,  1, 1, 1, 1,      0, -1, 0,
+                    -1 + pos2.x, -1 + pos2.y, 1 + pos2.z,  1, 1, 1, 1,     0, -1, 0,
+
+                    // //left
+                     -1 + pos2.x, -1 + pos2.y, 1 + pos2.z,  1, 1, 1, 1,     -1, 0, 0,
+                     -1 + pos2.x, 1 + pos2.y, 1 + pos2.z,  1, 1, 1, 1,      -1, 0, 0,
+                     -1 + pos2.x, 1 + pos2.y, -1 + pos2.z,  1, 1, 1, 1,     -1, 0, 0,
+
+                     -1 + pos2.x, 1 + pos2.y, -1 + pos2.z,  1, 1, 1, 1,     -1, 0, 0,
+                     -1 + pos2.x, -1 + pos2.y, -1 + pos2.z,  1, 1, 1, 1,    -1, 0, 0,
+                     -1 + pos2.x, -1 + pos2.y, 1 + pos2.z,  1, 1, 1, 1,     -1, 0, 0,
+
+                     // //back
+                      -1 + pos2.x, -1 + pos2.y, 1 + pos2.z,  1, 1, 1, 1,      0, 0, 1,
+                      -1 + pos2.x, 1 + pos2.y, 1 + pos2.z,  1, 1, 1, 1,       0, 0, 1,
+                      1 + pos2.x, 1 + pos2.y, 1 + pos2.z,  1, 1, 1, 1,        0, 0, 1,
+
+                      1 + pos2.x, 1 + pos2.y, 1 + pos2.z,  1, 1, 1, 1,        0, 0, 1,
+                      -1 + pos2.x, -1 + pos2.y, 1 + pos2.z,  1, 1, 1, 1,      0, 0, 1,
+                      1 + pos2.x, -1 + pos2.y, 1 + pos2.z,  1, 1, 1, 1,       0, 0, 1,
+
+                      // //right
+                       1 + pos2.x, -1 + pos2.y, 1 + pos2.z,  1, 1, 1, 1,      1, 0, 0,
+                       1 + pos2.x, -1 + pos2.y, -1 + pos2.z,  1, 1, 1, 1,     1, 0, 0,
+                       1 + pos2.x, 1 + pos2.y, -1 + pos2.z,  1, 1, 1, 1,      1, 0, 0,
+
+                       1 + pos2.x, 1 + pos2.y, -1 + pos2.z,  1, 1, 1, 1,      1, 0, 0,
+                       1 + pos2.x, -1 + pos2.y, 1 + pos2.z,  1, 1, 1, 1,      1, 0, 0,
+                       1 + pos2.x, 1 + pos2.y, 1 + pos2.z,  1, 1, 1, 1,       1, 0, 0,
+
+                       // //top
+                        1 + pos2.x, 1 + pos2.y, 1 + pos2.z,  1, 1, 1, 1, 0, 1, 0,
+                        -1 + pos2.x, 1 + pos2.y, 1 + pos2.z,  1, 1, 1, 1, 0, 1, 0,
+                        -1 + pos2.x, 1 + pos2.y, -1 + pos2.z,  1, 1, 1, 1, 0, 1, 0,
+
+                       -1 + pos2.x, 1 + pos2.y, -1 + pos2.z,  1, 1, 1, 1, 0, 1, 0,
+                       1 + pos2.x, 1 + pos2.y, 1 + pos2.z,  1, 1, 1, 1, 0, 1, 0,
+                       1 + pos2.x, 1 + pos2.y, -1 + pos2.z,  1, 1, 1, 1, 0, 1, 0,
+
+                       ////front
+                       1 + pos2.x, 1 + pos2.y, -1 + pos2.z,  1, 1, 1, 1, 0, 0, -1,
+                       -1 + pos2.x, 1 + pos2.y, -1 + pos2.z,  1, 1, 1, 1,  0, 0, -1,
+                       -1 + pos2.x, -1 + pos2.y, -1 + pos2.z,  1, 1, 1, 1,  0, 0, -1,
+
+                       -1 + pos2.x, -1 + pos2.y, -1 + pos2.z,  1, 1, 1, 1,  0, 0, -1,
+                       1 + pos2.x, -1 + pos2.y, -1 + pos2.z,  1, 1, 1, 1,  0, 0, -1,
+                       1 + pos2.x, 1 + pos2.y, -1 + pos2.z,  1, 1, 1, 1,  0, 0, -1,
+
+
+
+
+                        -flatSize + flatPos.x, flatPos.y, -flatSize + flatPos.z, flatColor,     0, 1, 0,
+                        -flatSize + flatPos.x, flatPos.y, flatSize + flatPos.z, 1, 1, 1, 1,      0, 1, 0,
+                      flatSize + flatPos.x, flatPos.y, -flatSize + flatPos.z, flatColor,      0, 1, 0,
+
+
+                      flatSize + flatPos.x, flatPos.y, -flatSize + flatPos.z, 1, 1, 1, 1,      0, 1, 0,
+                      flatSize + flatPos.x, flatPos.y, flatSize + flatPos.z, flatColor,       0, 1, 0,
+                        -flatSize + flatPos.x, flatPos.y, flatSize + flatPos.z, flatColor,      0, 1, 0,
+
             };
+
+
+
+            pos = { 3, -1, 6 };
+
+            VERTEX verticesPos2[] =
+            {
+                //bottom
+                    -1 + pos.x, -1 + pos.y, -1 + pos.z,  1, 1, 1, 1,    0, -1, 0,
+                    -1 + pos.x, -1 + pos.y, 1 + pos.z,  1, 1, 1, 1,     0, -1, 0,
+                    1 + pos.x, -1 + pos.y, -1 + pos.z,  1, 1, 1, 1,     0, -1, 0,
+
+
+                    1 + pos.x, -1 + pos.y, -1 + pos.z,  1, 1, 1, 1,     0, -1, 0,
+                    1 + pos.x, -1 + pos.y, 1 + pos.z,  1, 1, 1, 1,      0, -1, 0,
+                    -1 + pos.x, -1 + pos.y, 1 + pos.z,  1, 1, 1, 1,     0, -1, 0,
+
+                    // //left
+                     -1 + pos.x, -1 + pos.y, 1 + pos.z,  1, 1, 1, 1,     -1, 0, 0,
+                     -1 + pos.x, 1 + pos.y, 1 + pos.z,  1, 1, 1, 1,      -1, 0, 0,
+                     -1 + pos.x, 1 + pos.y, -1 + pos.z,  1, 1, 1, 1,     -1, 0, 0,
+
+                     -1 + pos.x, 1 + pos.y, -1 + pos.z,  1, 1, 1, 1,     -1, 0, 0,
+                     -1 + pos.x, -1 + pos.y, -1 + pos.z,  1, 1, 1, 1,    -1, 0, 0,
+                     -1 + pos.x, -1 + pos.y, 1 + pos.z,  1, 1, 1, 1,     -1, 0, 0,
+
+                     // //back
+                      -1 + pos.x, -1 + pos.y, 1 + pos.z,  1, 1, 1, 1,      0, 0, 1,
+                      -1 + pos.x, 1 + pos.y, 1 + pos.z,  1, 1, 1, 1,       0, 0, 1,
+                      1 + pos.x, 1 + pos.y, 1 + pos.z,  1, 1, 1, 1,        0, 0, 1,
+
+                      1 + pos.x, 1 + pos.y, 1 + pos.z,  1, 1, 1, 1,        0, 0, 1,
+                      -1 + pos.x, -1 + pos.y, 1 + pos.z,  1, 1, 1, 1,      0, 0, 1,
+                      1 + pos.x, -1 + pos.y, 1 + pos.z,  1, 1, 1, 1,       0, 0, 1,
+
+                      // //right
+                       1 + pos.x, -1 + pos.y, 1 + pos.z,  1, 1, 1, 1,      1, 0, 0,
+                       1 + pos.x, -1 + pos.y, -1 + pos.z,  1, 1, 1, 1,     1, 0, 0,
+                       1 + pos.x, 1 + pos.y, -1 + pos.z,  1, 1, 1, 1,      1, 0, 0,
+
+                       1 + pos.x, 1 + pos.y, -1 + pos.z,  1, 1, 1, 1,      1, 0, 0,
+                       1 + pos.x, -1 + pos.y, 1 + pos.z,  1, 1, 1, 1,      1, 0, 0,
+                       1 + pos.x, 1 + pos.y, 1 + pos.z,  1, 1, 1, 1,       1, 0, 0,
+
+                       // //top
+                        1 + pos.x, 1 + pos.y, 1 + pos.z,  1, 1, 1, 1, 0, 1, 0,
+                        -1 + pos.x, 1 + pos.y, 1 + pos.z,  1, 1, 1, 1, 0, 1, 0,
+                        -1 + pos.x, 1 + pos.y, -1 + pos.z,  1, 1, 1, 1, 0, 1, 0,
+
+                       -1 + pos.x, 1 + pos.y, -1 + pos.z,  1, 1, 1, 1, 0, 1, 0,
+                       1 + pos.x, 1 + pos.y, 1 + pos.z,  1, 1, 1, 1, 0, 1, 0,
+                       1 + pos.x, 1 + pos.y, -1 + pos.z,  1, 1, 1, 1, 0, 1, 0,
+
+                       ////front
+                       1 + pos.x, 1 + pos.y, -1 + pos.z,  1, 1, 1, 1, 0, 0, -1,
+                       -1 + pos.x, 1 + pos.y, -1 + pos.z,  1, 1, 1, 1,  0, 0, -1,
+                       -1 + pos.x, -1 + pos.y, -1 + pos.z,  1, 1, 1, 1,  0, 0, -1,
+
+                       -1 + pos.x, -1 + pos.y, -1 + pos.z,  1, 1, 1, 1,  0, 0, -1,
+                       1 + pos.x, -1 + pos.y, -1 + pos.z,  1, 1, 1, 1,  0, 0, -1,
+                       1 + pos.x, 1 + pos.y, -1 + pos.z,  1, 1, 1, 1,  0, 0, -1
+            };
+
+
+            //VERTEX verticesPos[] =
+            //{
+            //    1, 0, 0, 1,  -1, -1, 3,
+            //    0, 1, 0, 1,  0, 1, 1,
+            //    0, 0, 1, 1,   1, -1, 1,
+            //};
 
             vertexBuffer.buffer = verticesPos;
             vertexBuffer.vertexSize = sizeof(VERTEX);
-            vertexBuffer.verticesCount = sizeof(verticesPos) / sizeof(float3);
+            vertexBuffer.verticesCount = sizeof(verticesPos) / sizeof(VERTEX);
 
             device->SetViewPort(viewPort);
             device->SetVertexBuffer(&vertexBuffer);
             device->SetVertexShader(&testVS);
             device->SetPixelShader(&testPS);
+            device->SetDepthStencil(&depthStencil);
             
-            device->Draw(3);
+            device->ClearBuffer(float4{ 117.0f / 255, 165.0f / 255, 231.0f / 255, 1}, &swapChain->backBuffers[swapChain->currentBackBufferId]);
+            device->Draw(vertexBuffer.verticesCount);
 
-            swapChain->Prevent();
-            
-            //for (float x = 0; x < width; x++)
-            //    for (float y = 0; y < height; y++)
-            //    {
-            //        float colorX = swapChain->backBuffers[swapChain->frontBufferId].texture2D;
-
-            //        swapChain->backBuffers[1].texture2D
-            //        //SetPixel(hdc, x, y, RGB((int)color.x, (int)color.y, (int)color.z));
-            //    }
-
-
-            //for (int i = 0; i < verticesCount; i += 3)
-            //    for (int x = viewPort.left; x <= viewPort.right; x++)
-            //        for (int y = viewPort.top; y <= viewPort.bottom; y++)
-            //        {
-            //            float2 pixelPos = float2{ (x / width) * 2 - 1, ((height - y) / height) * 2 - 1 };
-            //            //memcpy(swapChain->backBuffers[swapChain->currentBackBufferId].texture2D[x][y * swapChain->backBuffers->format], );
-            //            memcpy((char*)swapChain->backBuffers[swapChain->currentBackBufferId].texture2D[x] + (y * swapChain->backBuffers->format), &DrawTriangle(pixelPos, i), swapChain->backBuffers->format);
-            //        }
+            swapChain->Prevent();       
 
             for (int x = viewPort.left; x < viewPort.right; x++)
                 for (int y = viewPort.top; y < viewPort.bottom; y++)
                 {
-                    if (x == viewPort.right)
-                        int point = 0;
                     float4 color = *(float4*)((char*)(swapChain)->backBuffers[(swapChain)->frontBufferId].texture2D[x] + (y * (swapChain)->backBuffers->format));
-                    //color.x = *(float*)((char*)swapChain->backBuffers[swapChain->frontBufferId].texture2D[x] + (y * swapChain->backBuffers->format));
-                    //color.y = *(float*)((char*)swapChain->backBuffers[swapChain->frontBufferId].texture2D[x] + (y * swapChain->backBuffers->format) + swapChain->backBuffers->format);
-                    //color.z = *(float*)((char*)swapChain->backBuffers[swapChain->frontBufferId].texture2D[x] + (y * swapChain->backBuffers->format) + 2 * swapChain->backBuffers->format);
-
-                    //float4 kek = *(float4*)((char*)(swapChain)->backBuffers[(swapChain)->frontBufferId].texture2D[x] + (y * (swapChain)->backBuffers->format));
 
                     if (color.x <= 0) color.x = 0;
                     if (color.y <= 0) color.y = 0;
                     if (color.z <= 0) color.z = 0;
+
+                    if (color.x > 1) color.x = 1;
+                    if (color.y > 1) color.y = 1;
+                    if (color.z > 1) color.z = 1;
 
                     color.x *= 255.0f;
                     color.y *= 255.0f;

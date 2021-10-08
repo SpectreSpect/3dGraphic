@@ -11,11 +11,13 @@ public:
 	{
 		float3 pos;
 		float4 color;
+		float3 normal;
 	};
 	struct Output
 	{
 		float3 pos;
 		float4 color;
+		float3 normal;
 	};
 	//Input input;
 	virtual void* Execute(void* vertexBuffer, int vertexOffeset) override;
