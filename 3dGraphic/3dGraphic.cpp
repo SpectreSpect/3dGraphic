@@ -8,6 +8,7 @@
 
 #include "TestVS.h"
 #include "TestPS.h"
+#include "MyDirectX/Input_Layout.h"
 
 #define MAX_LOADSTRING 100
 #define VIDEOCASHMEMORYSIZE 100000000
@@ -200,6 +201,13 @@ void func()
 TestVS testVS;
 VertexBuffer vertexBuffer;
 TestPS testPS;
+Input_Layout inputLayout;
+
+struct VERTEX
+{
+    float3 pos;
+    float4 color;
+};
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -215,6 +223,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         device = new Device(VIDEOCASHMEMORYSIZE);
         device->CreateSwapChain(&swapChain, 2, float2{ width, height }, DXGI_FORMAT_R32G32B32A32_FLOAT);
+
+        //Attribute attribute[] =
+        //{
+        //  {"POSITION", DXGI_FORMAT_R32G32B32A32_FLOAT, 0}
+        //};
+        Attribute* attribute = new Attribute[2];
+
+        char* semantic = (char*)"POSITION";
+
+        attribute[0] = { (char*)"POSITION", DXGI_FORMAT_R32G32B32_FLOAT, 0 };
+        attribute[1] = { (char*)"COLOR", DXGI_FORMAT_R32G32B32A32_FLOAT, DXGI_FORMAT_R32G32B32_FLOAT };
+
+        inputLayout.attributeBuffer = attribute;
+        //inputLayout.elementsCount = sizeof(attribute) / sizeof(Attribute);
+        inputLayout.elementsCount = 2;
+
+        device->SetInputLayout(&inputLayout);
     }
     case WM_COMMAND:
         {
@@ -250,15 +275,24 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             viewPort.right = clientRect.right;       
             viewPort.bottom = clientRect.bottom;
 
-            float3 verticesPos[] =
+            //float3 verticesPos[] =
+            //{
+            //    -1, -1, 3,  1, 1, 1, 1,
+            //    0, 1, 1,    0, 1, 0, 1,
+            //    1, -1, 1,   0, 0, 1, 1
+            //};
+
+            
+
+            VERTEX verticesPos[] =
             {
-                -1, -1, 1,
-                0, 1, 1,
-                1, -1, 1
+                -1, -1, 3,  1, 1, 1, 1,
+                0, 1, 1,    0, 1, 0, 1,
+                1, -1, 1,   0, 0, 1, 1
             };
 
             vertexBuffer.buffer = verticesPos;
-            vertexBuffer.vertexSize = sizeof(float3);
+            vertexBuffer.vertexSize = sizeof(VERTEX);
             vertexBuffer.verticesCount = sizeof(verticesPos) / sizeof(float3);
 
             device->SetViewPort(viewPort);
@@ -294,18 +328,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 {
                     if (x == viewPort.right)
                         int point = 0;
-                    float3 color{};
-                    color.x = *(float*)((char*)device->swapChain->backBuffers[swapChain->frontBufferId].texture2D[x] + (y * swapChain->backBuffers->format));
-                    color.y = *(float*)((char*)device->swapChain->backBuffers[swapChain->frontBufferId].texture2D[x] + (y * swapChain->backBuffers->format) + swapChain->backBuffers->format);
-                    color.z = *(float*)((char*)device->swapChain->backBuffers[swapChain->frontBufferId].texture2D[x] + (y * swapChain->backBuffers->format) + 2 * swapChain->backBuffers->format);
+                    float4 color = *(float4*)((char*)(swapChain)->backBuffers[(swapChain)->frontBufferId].texture2D[x] + (y * (swapChain)->backBuffers->format));
+                    //color.x = *(float*)((char*)swapChain->backBuffers[swapChain->frontBufferId].texture2D[x] + (y * swapChain->backBuffers->format));
+                    //color.y = *(float*)((char*)swapChain->backBuffers[swapChain->frontBufferId].texture2D[x] + (y * swapChain->backBuffers->format) + swapChain->backBuffers->format);
+                    //color.z = *(float*)((char*)swapChain->backBuffers[swapChain->frontBufferId].texture2D[x] + (y * swapChain->backBuffers->format) + 2 * swapChain->backBuffers->format);
+
+                    //float4 kek = *(float4*)((char*)(swapChain)->backBuffers[(swapChain)->frontBufferId].texture2D[x] + (y * (swapChain)->backBuffers->format));
 
                     if (color.x <= 0) color.x = 0;
                     if (color.y <= 0) color.y = 0;
                     if (color.z <= 0) color.z = 0;
 
-                    color.x *= 255;
-                    color.y *= 255;
-                    color.z *= 255;
+                    color.x *= 255.0f;
+                    color.y *= 255.0f;
+                    color.z *= 255.0f;
                     SetPixel(hdc, x, y, RGB((int)color.x, (int)color.y, (int)color.z));
                 }
 

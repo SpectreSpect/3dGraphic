@@ -48,4 +48,14 @@ struct float3
 
         return v;
     }
+
+    float3 operator+ (float3 inputVec)
+    {
+        float3 v{ x, y, z };
+
+        v.x += inputVec.x;
+        v.y += inputVec.y;
+        v.z += inputVec.z;
+        return v;
+    }
 };

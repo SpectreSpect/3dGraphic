@@ -5,6 +5,9 @@
 #include "VertexShader.h"
 #include "PixelShader.h"
 #include "SwapChain.h"
+#include "Input_Layout.h"
+
+#define NONE -23564343
 class Device
 {
 public:
@@ -13,15 +16,17 @@ public:
 	void SetVertexShader(VertexShader* vertexShader);
 	void SetPixelShader(PixelShader* pixelShader);
 	void SetViewPort(ViewPort viewPort);
+	void SetInputLayout(Input_Layout* inputLayout);
 	void CreateSwapChain(SwapChain** swapChain, int backBuffersCount, float2 backBuffersSize, DXGI_FORMAT format);
 	void Draw(int verticesCount);
-	SwapChain* swapChain;
+	SwapChain** swapChain;
 private:
 	VertexShader* vs;
 	PixelShader* ps;
 	ViewPort viewPort;
 	VertexBuffer* vertexBuffer;
 	VertexBuffer changedVertexBuffer;
+	Input_Layout* inputLayout;
 
 	void* backBuffers;
 	void* videoHashMemory;

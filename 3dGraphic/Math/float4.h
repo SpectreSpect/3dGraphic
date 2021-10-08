@@ -54,4 +54,16 @@ struct float4
 
         return v;
     }
+
+    float4 operator+ (float4 inputVec)
+    {
+        float4 v{ x, y, z, w };
+
+        v.x += inputVec.x;
+        v.y += inputVec.y;
+        v.z += inputVec.z;
+        v.w += inputVec.w;
+
+        return v;
+    }
 };
