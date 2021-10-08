@@ -40,14 +40,7 @@ private:
 	void* backBuffers;
 	void* videoHashMemory;
 	size_t videoHashMemorySize;
-
-
-	//float4 DrawTriangle(float2 pixelPos, float3 A, float3 B, float3 C);
 	float3 GetUVZ(float2 pixelPos, int firstVertexID);
 	float4 DrawTriangle(float2 pixelPos, int firstVertexID);
-	float4 DrawTriangle(float2 pixelPos, int firstVertexID, float3 uvz);
-	void FillDepthStencil();
-	void ExecuteVertexShader();
-	//float4 DrawTriangle(float2 pixelPos);
 };
 
