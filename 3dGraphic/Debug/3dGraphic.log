@@ -1,4 +1,6 @@
 ﻿  Device.cpp
-E:\VisualStudioProjects\3dGraphic\3dGraphic\MyDirectX\Device.cpp(171,21): warning C4244: инициализация: преобразование "int" в "float", возможна потеря данных
-E:\VisualStudioProjects\3dGraphic\3dGraphic\MyDirectX\Device.cpp(172,22): warning C4244: инициализация: преобразование "int" в "float", возможна потеря данных
+E:\VisualStudioProjects\3dGraphic\3dGraphic\MyDirectX\Device.cpp(59,115): warning C4305: =: усечение из "__int64" в "float"
+E:\VisualStudioProjects\3dGraphic\3dGraphic\MyDirectX\Device.cpp(184,21): warning C4244: инициализация: преобразование "int" в "float", возможна потеря данных
+E:\VisualStudioProjects\3dGraphic\3dGraphic\MyDirectX\Device.cpp(185,22): warning C4244: инициализация: преобразование "int" в "float", возможна потеря данных
+E:\VisualStudioProjects\3dGraphic\3dGraphic\MyDirectX\Device.cpp(160): warning C4715: Device::DrawTriangle: значение возвращается не при всех путях выполнения
   3dGraphic.vcxproj -> E:\VisualStudioProjects\3dGraphic\Debug\3dGraphic.exe

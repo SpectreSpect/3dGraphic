@@ -211,6 +211,81 @@ struct VERTEX
     float3 normal;
 };
 
+VERTEX* DrawCube(float3 pos, ViewPort viewPort)
+{
+    //float3 pos = { 3, -4, 8 };
+    VERTEX vertices[] =
+    {
+        //bottom
+        -1 + pos.x, -1 + pos.y, -1 + pos.z,  1, 1, 1, 1,    0, -1, 0,
+        -1 + pos.x, -1 + pos.y, 1 + pos.z,  1, 1, 1, 1,     0, -1, 0,
+        1 + pos.x, -1 + pos.y, -1 + pos.z,  1, 1, 1, 1,     0, -1, 0,
+
+
+        1 + pos.x, -1 + pos.y, -1 + pos.z,  1, 1, 1, 1,     0, -1, 0,
+        1 + pos.x, -1 + pos.y, 1 + pos.z,  1, 1, 1, 1,      0, -1, 0,
+        -1 + pos.x, -1 + pos.y, 1 + pos.z,  1, 1, 1, 1,     0, -1, 0,
+
+        // //left
+         -1 + pos.x, -1 + pos.y, 1 + pos.z,  1, 1, 1, 1,     -1, 0, 0,
+         -1 + pos.x, 1 + pos.y, 1 + pos.z,  1, 1, 1, 1,      -1, 0, 0,
+         -1 + pos.x, 1 + pos.y, -1 + pos.z,  1, 1, 1, 1,     -1, 0, 0,
+
+         -1 + pos.x, 1 + pos.y, -1 + pos.z,  1, 1, 1, 1,     -1, 0, 0,
+         -1 + pos.x, -1 + pos.y, -1 + pos.z,  1, 1, 1, 1,    -1, 0, 0,
+         -1 + pos.x, -1 + pos.y, 1 + pos.z,  1, 1, 1, 1,     -1, 0, 0,
+
+         // //back
+          -1 + pos.x, -1 + pos.y, 1 + pos.z,  1, 1, 1, 1,      0, 0, 1,
+          -1 + pos.x, 1 + pos.y, 1 + pos.z,  1, 1, 1, 1,       0, 0, 1,
+          1 + pos.x, 1 + pos.y, 1 + pos.z,  1, 1, 1, 1,        0, 0, 1,
+
+          1 + pos.x, 1 + pos.y, 1 + pos.z,  1, 1, 1, 1,        0, 0, 1,
+          -1 + pos.x, -1 + pos.y, 1 + pos.z,  1, 1, 1, 1,      0, 0, 1,
+          1 + pos.x, -1 + pos.y, 1 + pos.z,  1, 1, 1, 1,       0, 0, 1,
+
+          // //right
+           1 + pos.x, -1 + pos.y, 1 + pos.z,  1, 1, 1, 1,      1, 0, 0,
+           1 + pos.x, -1 + pos.y, -1 + pos.z,  1, 1, 1, 1,     1, 0, 0,
+           1 + pos.x, 1 + pos.y, -1 + pos.z,  1, 1, 1, 1,      1, 0, 0,
+
+           1 + pos.x, 1 + pos.y, -1 + pos.z,  1, 1, 1, 1,      1, 0, 0,
+           1 + pos.x, -1 + pos.y, 1 + pos.z,  1, 1, 1, 1,      1, 0, 0,
+           1 + pos.x, 1 + pos.y, 1 + pos.z,  1, 1, 1, 1,       1, 0, 0,
+
+           // //top
+            1 + pos.x, 1 + pos.y, 1 + pos.z,  1, 1, 1, 1, 0, 1, 0,
+            -1 + pos.x, 1 + pos.y, 1 + pos.z,  1, 1, 1, 1, 0, 1, 0,
+            -1 + pos.x, 1 + pos.y, -1 + pos.z,  1, 1, 1, 1, 0, 1, 0,
+
+           -1 + pos.x, 1 + pos.y, -1 + pos.z,  1, 1, 1, 1, 0, 1, 0,
+           1 + pos.x, 1 + pos.y, 1 + pos.z,  1, 1, 1, 1, 0, 1, 0,
+           1 + pos.x, 1 + pos.y, -1 + pos.z,  1, 1, 1, 1, 0, 1, 0,
+
+           //   ////front
+              1 + pos.x, 1 + pos.y, -1 + pos.z,  1, 1, 1, 1, 0, 0, -1,
+              -1 + pos.x, 1 + pos.y, -1 + pos.z,  1, 1, 1, 1,  0, 0, -1,
+              -1 + pos.x, -1 + pos.y, -1 + pos.z,  1, 1, 1, 1,  0, 0, -1,
+
+              -1 + pos.x, -1 + pos.y, -1 + pos.z,  1, 1, 1, 1,  0, 0, -1,
+              1 + pos.x, -1 + pos.y, -1 + pos.z,  1, 1, 1, 1,  0, 0, -1,
+              1 + pos.x, 1 + pos.y, -1 + pos.z,  1, 1, 1, 1,  0, 0, -1,
+    };
+
+    vertexBuffer.buffer = vertices;
+    vertexBuffer.vertexSize = sizeof(VERTEX);
+    vertexBuffer.verticesCount = sizeof(vertices) / sizeof(VERTEX);
+
+    device->SetViewPort(viewPort);
+    device->SetVertexBuffer(&vertexBuffer);
+    device->SetVertexShader(&testVS);
+    device->SetPixelShader(&testPS);
+
+    device->Draw(vertexBuffer.verticesCount);
+
+    return vertices;
+}
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
@@ -226,10 +301,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         device = new Device(VIDEOCASHMEMORYSIZE);
         device->CreateSwapChain(&swapChain, 2, float2{ width, height }, DXGI_FORMAT_R32G32B32A32_FLOAT);
 
-        //Attribute attribute[] =
-        //{
-        //  {"POSITION", DXGI_FORMAT_R32G32B32A32_FLOAT, 0}
-        //};
         Attribute* attribute = new Attribute[3];
 
         attribute[0] = { (char*)"POSITION", DXGI_FORMAT_R32G32B32_FLOAT, 0 };
@@ -242,137 +313,74 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         device->SetInputLayout(&inputLayout);
 
-        depthStencil.InitTexture2D(DXGI_FORMAT_R32G32B32A32_FLOAT, float2{ width, height });
+        depthStencil.InitTexture2D(DXGI_FORMAT_R32_FLOAT, float2{ width, height });
     }
     case WM_COMMAND:
+    {
+        int wmId = LOWORD(wParam);
+        // Разобрать выбор в меню:
+        switch (wmId)
         {
-            int wmId = LOWORD(wParam);
-            // Разобрать выбор в меню:
-            switch (wmId)
-            {
-            case IDM_ABOUT:
-                DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
-                break;
-            case IDM_EXIT:
-                DestroyWindow(hWnd);
-                break;
-            default:
-                return DefWindowProc(hWnd, message, wParam, lParam);
-            }
+        case IDM_ABOUT:
+            DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+            break;
+        case IDM_EXIT:
+            DestroyWindow(hWnd);
+            break;
+        default:
+            return DefWindowProc(hWnd, message, wParam, lParam);
         }
-        break;
+    }
+    break;
     case WM_PAINT:
-        {
-            PAINTSTRUCT ps;
-            HDC hdc = BeginPaint(hWnd, &ps);
+    {
+        PAINTSTRUCT ps;
+        HDC hdc = BeginPaint(hWnd, &ps);
 
-            RECT clientRect{};
-            GetClientRect(hWnd, &clientRect);
+        RECT clientRect{};
+        GetClientRect(hWnd, &clientRect);
 
-            int width = clientRect.right - clientRect.left;
-            int height = clientRect.bottom - clientRect.top;
+        int width = clientRect.right - clientRect.left;
+        int height = clientRect.bottom - clientRect.top;
 
-            ViewPort viewPort;
-            viewPort.left = clientRect.left;
-            viewPort.top = clientRect.top;
-            viewPort.right = clientRect.right;       
-            viewPort.bottom = clientRect.bottom;
+        ViewPort viewPort;
+        viewPort.left = clientRect.left;
+        viewPort.top = clientRect.top;
+        viewPort.right = clientRect.right;
+        viewPort.bottom = clientRect.bottom;
 
-            float3 pos = {3, -4, 8};
-            VERTEX verticesPos[] =
+
+
+
+
+        device->ClearBuffer(float4{ 117.0f / 255, 165.0f / 255, 231.0f / 255, 1 }, &swapChain->backBuffers[swapChain->currentBackBufferId]);
+        device->SetDepthStencil(&depthStencil);
+        DrawCube({ 3, -4, 8 }, viewPort);
+        DrawCube({ 2, -3, 9 }, viewPort);
+
+        swapChain->Prevent();
+
+        for (int x = viewPort.left; x < viewPort.right; x++)
+            for (int y = viewPort.top; y < viewPort.bottom; y++)
             {
-                //bottom
-                -1 + pos.x, -1 + pos.y, -1 + pos.z,  1, 1, 1, 1,    0, -1, 0,
-                -1 + pos.x, -1 + pos.y, 1 + pos.z,  1, 1, 1, 1,     0, -1, 0,
-                1 + pos.x, -1 + pos.y, -1 + pos.z,  1, 1, 1, 1,     0, -1, 0,
+                float4 color = *(float4*)((char*)(swapChain)->backBuffers[(swapChain)->frontBufferId].texture2D[x] + (y * (swapChain)->backBuffers->format));
 
+                if (color.x <= 0) color.x = 0;
+                if (color.y <= 0) color.y = 0;
+                if (color.z <= 0) color.z = 0;
 
-                1 + pos.x, -1 + pos.y, -1 + pos.z,  1, 1, 1, 1,     0, -1, 0,
-                1 + pos.x, -1 + pos.y, 1 + pos.z,  1, 1, 1, 1,      0, -1, 0,
-                -1 + pos.x, -1 + pos.y, 1 + pos.z,  1, 1, 1, 1,     0, -1, 0,
+                if (color.x > 1) color.x = 1;
+                if (color.y > 1) color.y = 1;
+                if (color.z > 1) color.z = 1;
 
-                // //left
-                 -1 + pos.x, -1 + pos.y, 1 + pos.z,  1, 1, 1, 1,     -1, 0, 0,
-                 -1 + pos.x, 1 + pos.y, 1 + pos.z,  1, 1, 1, 1,      -1, 0, 0,
-                 -1 + pos.x, 1 + pos.y, -1 + pos.z,  1, 1, 1, 1,     -1, 0, 0,
-
-                 -1 + pos.x, 1 + pos.y, -1 + pos.z,  1, 1, 1, 1,     -1, 0, 0,
-                 -1 + pos.x, -1 + pos.y, -1 + pos.z,  1, 1, 1, 1,    -1, 0, 0,
-                 -1 + pos.x, -1 + pos.y, 1 + pos.z,  1, 1, 1, 1,     -1, 0, 0,
-
-                 // //back
-                  -1 + pos.x, -1 + pos.y, 1 + pos.z,  1, 1, 1, 1,      0, 0, 1,
-                  -1 + pos.x, 1 + pos.y, 1 + pos.z,  1, 1, 1, 1,       0, 0, 1,
-                  1 + pos.x, 1 + pos.y, 1 + pos.z,  1, 1, 1, 1,        0, 0, 1,
-
-                  1 + pos.x, 1 + pos.y, 1 + pos.z,  1, 1, 1, 1,        0, 0, 1,
-                  -1 + pos.x, -1 + pos.y, 1 + pos.z,  1, 1, 1, 1,      0, 0, 1,
-                  1 + pos.x, -1 + pos.y, 1 + pos.z,  1, 1, 1, 1,       0, 0, 1,
-
-                  // //right
-                   1 + pos.x, -1 + pos.y, 1 + pos.z,  1, 1, 1, 1,      1, 0, 0,
-                   1 + pos.x, -1 + pos.y, -1 + pos.z,  1, 1, 1, 1,     1, 0, 0,
-                   1 + pos.x, 1 + pos.y, -1 + pos.z,  1, 1, 1, 1,      1, 0, 0,
-
-                   1 + pos.x, 1 + pos.y, -1 + pos.z,  1, 1, 1, 1,      1, 0, 0,
-                   1 + pos.x, -1 + pos.y, 1 + pos.z,  1, 1, 1, 1,      1, 0, 0,
-                   1 + pos.x, 1 + pos.y, 1 + pos.z,  1, 1, 1, 1,       1, 0, 0,
-
-                   // //top
-                    1 + pos.x, 1 + pos.y, 1 + pos.z,  1, 1, 1, 1, 0, 1, 0,
-                    -1 + pos.x, 1 + pos.y, 1 + pos.z,  1, 1, 1, 1, 0, 1, 0,
-                    -1 + pos.x, 1 + pos.y, -1 + pos.z,  1, 1, 1, 1, 0, 1, 0,
-
-                   -1 + pos.x, 1 + pos.y, -1 + pos.z,  1, 1, 1, 1, 0, 1, 0,
-                   1 + pos.x, 1 + pos.y, 1 + pos.z,  1, 1, 1, 1, 0, 1, 0,
-                   1 + pos.x, 1 + pos.y, -1 + pos.z,  1, 1, 1, 1, 0, 1, 0,
-
-                   ////front
-                   1 + pos.x, 1 + pos.y, -1 + pos.z,  1, 1, 1, 1, 0, 0, -1,
-                   -1 + pos.x, 1 + pos.y, -1 + pos.z,  1, 1, 1, 1,  0, 0, -1,
-                   -1 + pos.x, -1 + pos.y, -1 + pos.z,  1, 1, 1, 1,  0, 0, -1,
-
-                   -1 + pos.x, -1 + pos.y, -1 + pos.z,  1, 1, 1, 1,  0, 0, -1,
-                   1 + pos.x, -1 + pos.y, -1 + pos.z,  1, 1, 1, 1,  0, 0, -1,
-                   1 + pos.x, 1 + pos.y, -1 + pos.z,  1, 1, 1, 1,  0, 0, -1,
-            };
-
-            vertexBuffer.buffer = verticesPos;
-            vertexBuffer.vertexSize = sizeof(VERTEX);
-            vertexBuffer.verticesCount = sizeof(verticesPos) / sizeof(VERTEX);
-
-            device->SetViewPort(viewPort);
-            device->SetVertexBuffer(&vertexBuffer);
-            device->SetVertexShader(&testVS);
-            device->SetPixelShader(&testPS);
-            device->SetDepthStencil(&depthStencil);
-            
-            device->ClearBuffer(float4{ 117.0f / 255, 165.0f / 255, 231.0f / 255, 1}, &swapChain->backBuffers[swapChain->currentBackBufferId]);
-            device->Draw(vertexBuffer.verticesCount);
-
-            swapChain->Prevent();       
-
-            for (int x = viewPort.left; x < viewPort.right; x++)
-                for (int y = viewPort.top; y < viewPort.bottom; y++)
-                {
-                    float4 color = *(float4*)((char*)(swapChain)->backBuffers[(swapChain)->frontBufferId].texture2D[x] + (y * (swapChain)->backBuffers->format));
-
-                    if (color.x <= 0) color.x = 0;
-                    if (color.y <= 0) color.y = 0;
-                    if (color.z <= 0) color.z = 0;
-
-                    if (color.x > 1) color.x = 1;
-                    if (color.y > 1) color.y = 1;
-                    if (color.z > 1) color.z = 1;
-
-                    color.x *= 255.0f;
-                    color.y *= 255.0f;
-                    color.z *= 255.0f;
-                    SetPixel(hdc, x, y, RGB((int)color.x, (int)color.y, (int)color.z));
-                }
-            EndPaint(hWnd, &ps);
-        }
-        break;
+                color.x *= 255.0f;
+                color.y *= 255.0f;
+                color.z *= 255.0f;
+                SetPixel(hdc, x, y, RGB((int)color.x, (int)color.y, (int)color.z));
+            }
+        EndPaint(hWnd, &ps);
+    }
+    break;
     case WM_DESTROY:
         PostQuitMessage(0);
         break;

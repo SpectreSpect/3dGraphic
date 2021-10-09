@@ -52,6 +52,11 @@ void Device::CreateSwapChain(SwapChain** swapChain, int backBuffersCount, float2
 void Device::SetDepthStencil(Texture2D* depthStencil)
 {
     this->depthStencil = depthStencil;
+
+    if(this->depthStencil)
+        for(int x = 0; x < this->depthStencil->size.x; x++)
+            for (int y = 0; y < this->depthStencil->size.y; y++)
+                *(float*)(&(((char**)this->depthStencil->texture2D)[x][y * this->depthStencil->format])) = BIG_NUM;
 }
 
 float3 Device::GetUVZ(float2 pixelPos, int firstVertexID)
@@ -95,46 +100,63 @@ float3 Device::GetUVZ(float2 pixelPos, int firstVertexID)
 }
 
 
-float4 Device::DrawTriangle(float2 pixelPos, int firstVertexID)
+float4  Device::DrawTriangle(float2 pixelPos, float2 _PixelPos, int firstVertexID, void* localVertex)
 {
+    float** depthStencilTexture2D = (float**)depthStencil->texture2D;
     if (inputLayout)
     {
-        float3 uvz = GetUVZ(pixelPos, firstVertexID);
+        float3 uvz = GetUVZ(_PixelPos, firstVertexID);
         float u = uvz.x;
         float v = uvz.y;
         float z = uvz.z;
 
         if ((u + v <= 1) && (u >= 0) && (u <= 1) && (v >= 0) && (v <= 1) && (1 - u - v >= 0) && (1 - u - v <= 1))
         {
-            int byteCountInVertex = inputLayout->attributeBuffer[inputLayout->elementsCount - 1].offsetInVertex + inputLayout->attributeBuffer[inputLayout->elementsCount - 1].format;
-            void* vertex = new char[byteCountInVertex];
-
-            for (int i = 0; i < inputLayout->elementsCount; i++)
+            if (z < depthStencilTexture2D[(int)pixelPos.x][(int)pixelPos.y])
             {
-                int offset = inputLayout->attributeBuffer[i].offsetInVertex;
-                if (inputLayout->attributeBuffer[i].format == DXGI_FORMAT_R32G32B32_FLOAT)
+                depthStencilTexture2D[(int)pixelPos.x][(int)pixelPos.y] = z;
+                //int byteCountInVertex = inputLayout->attributeBuffer[inputLayout->elementsCount - 1].offsetInVertex + inputLayout->attributeBuffer[inputLayout->elementsCount - 1].format;
+                //void* vertex = new char[byteCountInVertex];
+
+                for (int i = 0; i < inputLayout->elementsCount; i++)
                 {
-                    float3 elementVertex1 = *(float3*)((char*)changedVertexBuffer.buffer + offset + firstVertexID * changedVertexBuffer.vertexSize);
-                    float3 elementVertex2 = *(float3*)((char*)changedVertexBuffer.buffer + offset + (firstVertexID + 1) * changedVertexBuffer.vertexSize);
-                    float3 elementVertex3 = *(float3*)((char*)changedVertexBuffer.buffer + offset + (firstVertexID + 2) * changedVertexBuffer.vertexSize);
-                    float3 element = elementVertex1 * (1 - u - v) + elementVertex2 * u + elementVertex3 * v;
-                    memcpy((char*)vertex + offset, &element, sizeof(float3));
+                    int offset = inputLayout->attributeBuffer[i].offsetInVertex;
+                    switch (inputLayout->attributeBuffer[i].format)
+                    {
+                    case DXGI_FORMAT_R32G32B32_FLOAT:
+                    {
+                        float3 elementVertex1 = *(float3*)((char*)changedVertexBuffer.buffer + offset + firstVertexID * changedVertexBuffer.vertexSize);
+                        float3 elementVertex2 = *(float3*)((char*)changedVertexBuffer.buffer + offset + (firstVertexID + 1) * changedVertexBuffer.vertexSize);
+                        float3 elementVertex3 = *(float3*)((char*)changedVertexBuffer.buffer + offset + (firstVertexID + 2) * changedVertexBuffer.vertexSize);
+                        float3 element = elementVertex1 * (1 - u - v) + elementVertex2 * u + elementVertex3 * v;
+                        memcpy((char*)localVertex + offset, &element, sizeof(float3));
+                        break;
+                    }
+                    case DXGI_FORMAT_R32G32B32A32_FLOAT:
+                    {
+                        float4 elementVertex1 = *(float4*)((char*)changedVertexBuffer.buffer + offset + firstVertexID * changedVertexBuffer.vertexSize);
+                        float4 elementVertex2 = *(float4*)((char*)changedVertexBuffer.buffer + offset + (firstVertexID + 1) * changedVertexBuffer.vertexSize);
+                        float4 elementVertex3 = *(float4*)((char*)changedVertexBuffer.buffer + offset + (firstVertexID + 2) * changedVertexBuffer.vertexSize);
+                        float4 element = elementVertex1 * (1 - u - v) + elementVertex2 * u + elementVertex3 * v;
+                        memcpy((char*)localVertex + offset, &element, sizeof(float4));
+                        break;
+                    }
+                    }
                 }
-                else if (inputLayout->attributeBuffer[i].format == DXGI_FORMAT_R32G32B32A32_FLOAT)
-                {
-                    float4 elementVertex1 = *(float4*)((char*)changedVertexBuffer.buffer + offset + firstVertexID * changedVertexBuffer.vertexSize);
-                    float4 elementVertex2 = *(float4*)((char*)changedVertexBuffer.buffer + offset + (firstVertexID + 1) * changedVertexBuffer.vertexSize);
-                    float4 elementVertex3 = *(float4*)((char*)changedVertexBuffer.buffer + offset + (firstVertexID + 2) * changedVertexBuffer.vertexSize);
-                    float4 element = elementVertex1 * (1 - u - v) + elementVertex2 * u + elementVertex3 * v;
-                    memcpy((char*)vertex + offset, &element, sizeof(float4));
-                }
+
+                if (firstVertexID == 0)
+                    int pint = 5;
+
+                float4 color = ps->Execute(localVertex);
+                return color;
+
+                //float4 pos = *(float4*)localVertex;
             }
-            float4 color = ps->Execute(vertex);
-            return color;
         }
-        return float4{ 0, 0, 0, 0 };
+        else
+            return float4{ 0, 0, 0, 0 };
     }
-    else throw; 
+    else throw;
 }
 
 void Device::ClearBuffer(float4 color, Texture2D* texture)
@@ -142,8 +164,6 @@ void Device::ClearBuffer(float4 color, Texture2D* texture)
     for (int x = 0; x < texture->size.x; x++)
         for (int y = 0; y < texture->size.y; y++)
             memcpy((char*)texture->texture2D[x] + y * texture->format, &color, sizeof(float4));
-
-    float4 point = *(float4*)((char*)texture->texture2D[0] + (int)texture->size.y * texture->format);
 }
 
 
@@ -164,18 +184,26 @@ void Device::Draw(int verticesCount)
         float width = viewPort.right - viewPort.left;
         float height = viewPort.bottom - viewPort.top;
 
-            for (int i = 0; i < verticesCount; i += 3)
-                for (int x = viewPort.left; x < viewPort.right; x++)
-                    for (int y = viewPort.top; y < viewPort.bottom; y++)
-                    {
+        int byteCountInVertex = inputLayout->attributeBuffer[inputLayout->elementsCount - 1].offsetInVertex + inputLayout->attributeBuffer[inputLayout->elementsCount - 1].format;
+        void* vertex = new char[byteCountInVertex];
 
-                        float2 pixelPos = float2{ (x / width) * 2 - 1, ((height - y) / height) * 2 - 1 };
+        for (int x = viewPort.left; x < viewPort.right; x++)
+            for (int y = viewPort.top; y < viewPort.bottom; y++)
+            {
+                float transfromCoef = width / height;
+                float2 _PixelPos = float2{ ((x / width) * 2 - 1) * transfromCoef, ((height - y) / height) * 2 - 1 };
+                float2 pixelPos = float2{ (float)x, (float)y };
+                float4 color{};
+                for (int i = 0; i < verticesCount; i += 3)
+                {
+                    float4 tempColor = DrawTriangle(pixelPos, _PixelPos, i, vertex);
+                    if(tempColor.w != 0)
+                        color = tempColor;
+                }
+                    if (color.w != 0)
+                        memcpy((char*)(*swapChain)->backBuffers[(*swapChain)->currentBackBufferId].texture2D[x] + (y * (*swapChain)->backBuffers->format), &color, (*swapChain)->backBuffers->format);
+            }
 
-                        float4 color = DrawTriangle(pixelPos, i);
-
-                        if (color.w != 0)
-                            memcpy((char*)(*swapChain)->backBuffers[(*swapChain)->currentBackBufferId].texture2D[x] + (y * (*swapChain)->backBuffers->format), &color, (*swapChain)->backBuffers->format);
-                    }  
     }
     else
         throw;

@@ -41,6 +41,6 @@ private:
 	void* videoHashMemory;
 	size_t videoHashMemorySize;
 	float3 GetUVZ(float2 pixelPos, int firstVertexID);
-	float4 DrawTriangle(float2 pixelPos, int firstVertexID);
+	float4 DrawTriangle(float2 pixelPos, float2 _PixelPos, int firstVertexID, void* localVertex);
 };
 
