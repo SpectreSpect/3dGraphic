@@ -140,6 +140,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="3dGraphic.h" />
+    <ClInclude Include="MyDirectX\IndexBuffer.h" />
     <ClInclude Include="MyDirectX\DepthStencil.h" />
     <ClInclude Include="MyDirectX\Input_Layout.h" />
     <ClInclude Include="MyDirectX\Attribute.h" />
@@ -164,6 +165,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="3dGraphic.cpp" />
+    <ClCompile Include="MyDirectX\IndexBuffer.cpp" />
     <ClCompile Include="MyDirectX\DepthStencil.cpp" />
     <ClCompile Include="MyDirectX\Input_Layout.cpp" />
     <ClCompile Include="MyDirectX\AttributeBuffer.cpp" />

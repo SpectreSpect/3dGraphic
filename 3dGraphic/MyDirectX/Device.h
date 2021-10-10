@@ -6,6 +6,7 @@
 #include "PixelShader.h"
 #include "SwapChain.h"
 #include "Input_Layout.h"
+#include "IndexBuffer.h"
 
 #define NONE -228
 #define BIG_NUM 999999999999
@@ -25,6 +26,7 @@ public:
 	void SetInputLayout(Input_Layout* inputLayout);
 	void CreateSwapChain(SwapChain** swapChain, int backBuffersCount, float2 backBuffersSize, DXGI_FORMAT format);
 	void SetDepthStencil(Texture2D* depthStencil);
+	void SetIndexBuffer(IndexBuffer* indexBuffer);
 	void Draw(int verticesCount);
 	void ClearBuffer(float4 color, Texture2D* texture);
 	SwapChain** swapChain;
@@ -36,6 +38,7 @@ private:
 	VertexBuffer changedVertexBuffer;
 	Input_Layout* inputLayout;
 	Texture2D* depthStencil;
+	IndexBuffer* indexBuffer;
 
 	void* backBuffers;
 	void* videoHashMemory;

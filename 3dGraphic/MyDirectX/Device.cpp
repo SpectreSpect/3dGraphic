@@ -59,6 +59,11 @@ void Device::SetDepthStencil(Texture2D* depthStencil)
                 *(float*)(&(((char**)this->depthStencil->texture2D)[x][y * this->depthStencil->format])) = BIG_NUM;
 }
 
+void Device::SetIndexBuffer(IndexBuffer* indexBuffer)
+{
+    this->indexBuffer = indexBuffer;
+}
+
 float3 Device::GetUVZ(float2 pixelPos, int firstVertexID)
 {
 
@@ -69,7 +74,6 @@ float3 Device::GetUVZ(float2 pixelPos, int firstVertexID)
             posID = i;
             int kek = 0;
         }
-
 
     if (posID == NONE)
         throw;
@@ -115,9 +119,6 @@ float4  Device::DrawTriangle(float2 pixelPos, float2 _PixelPos, int firstVertexI
             if (z < depthStencilTexture2D[(int)pixelPos.x][(int)pixelPos.y])
             {
                 depthStencilTexture2D[(int)pixelPos.x][(int)pixelPos.y] = z;
-                //int byteCountInVertex = inputLayout->attributeBuffer[inputLayout->elementsCount - 1].offsetInVertex + inputLayout->attributeBuffer[inputLayout->elementsCount - 1].format;
-                //void* vertex = new char[byteCountInVertex];
-
                 for (int i = 0; i < inputLayout->elementsCount; i++)
                 {
                     int offset = inputLayout->attributeBuffer[i].offsetInVertex;
@@ -149,8 +150,6 @@ float4  Device::DrawTriangle(float2 pixelPos, float2 _PixelPos, int firstVertexI
 
                 float4 color = ps->Execute(localVertex);
                 return color;
-
-                //float4 pos = *(float4*)localVertex;
             }
         }
         else
