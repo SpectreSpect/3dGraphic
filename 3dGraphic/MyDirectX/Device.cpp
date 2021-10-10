@@ -78,9 +78,22 @@ float3 Device::GetUVZ(float2 pixelPos, int firstVertexID)
     if (posID == NONE)
         throw;
 
-    float3 A = *(float3*)((char*)changedVertexBuffer.buffer + inputLayout->attributeBuffer[posID].offsetInVertex + firstVertexID * changedVertexBuffer.vertexSize);
-    float3 B = *(float3*)((char*)changedVertexBuffer.buffer + inputLayout->attributeBuffer[posID].offsetInVertex + (firstVertexID + 1) * changedVertexBuffer.vertexSize);
-    float3 C = *(float3*)((char*)changedVertexBuffer.buffer + inputLayout->attributeBuffer[posID].offsetInVertex + (firstVertexID + 2) * changedVertexBuffer.vertexSize);
+    float3 A{};
+    float3 B{};
+    float3 C{};
+
+    if (indexBuffer)
+    {
+        A = *(float3*)((char*)changedVertexBuffer.buffer + inputLayout->attributeBuffer[posID].offsetInVertex + indexBuffer->buffer[firstVertexID] * changedVertexBuffer.vertexSize);
+        B = *(float3*)((char*)changedVertexBuffer.buffer + inputLayout->attributeBuffer[posID].offsetInVertex + indexBuffer->buffer[firstVertexID + 1] * changedVertexBuffer.vertexSize);
+        C = *(float3*)((char*)changedVertexBuffer.buffer + inputLayout->attributeBuffer[posID].offsetInVertex + indexBuffer->buffer[firstVertexID + 2] * changedVertexBuffer.vertexSize);
+    }
+    else
+    {
+        A = *(float3*)((char*)changedVertexBuffer.buffer + inputLayout->attributeBuffer[posID].offsetInVertex + firstVertexID * changedVertexBuffer.vertexSize);
+        B = *(float3*)((char*)changedVertexBuffer.buffer + inputLayout->attributeBuffer[posID].offsetInVertex + (firstVertexID + 1) * changedVertexBuffer.vertexSize);
+        C = *(float3*)((char*)changedVertexBuffer.buffer + inputLayout->attributeBuffer[posID].offsetInVertex + (firstVertexID + 2) * changedVertexBuffer.vertexSize);
+    }
 
     float3 a = B - A;
     float3 b = C - A;
@@ -90,7 +103,7 @@ float3 Device::GetUVZ(float2 pixelPos, int firstVertexID)
     float delta = -(a.x * b.y) - (a.z * b.x * y) - (a.y * b.z * x) + (x * b.y * a.z) + (b.z * y * a.x) + (a.y * b.x);
 
     if (delta == 0)
-        return float3{ -1, -1, -1};
+        return float3{ -1, -1, -1 };
 
     float deltaU = (A.x * b.y) + (A.z * b.x * y) + (A.y * b.z * x) - (A.z * b.y * x) - (A.y * b.x) - (A.x * b.z * y);
     float deltaV = (a.x * A.y) + (A.x * y * a.z) + (a.y * A.z * x) - (a.z * A.y * x) - (a.y * A.x) - (A.z * y * a.x);
@@ -104,12 +117,13 @@ float3 Device::GetUVZ(float2 pixelPos, int firstVertexID)
 }
 
 
-float4  Device::DrawTriangle(float2 pixelPos, float2 _PixelPos, int firstVertexID, void* localVertex)
+float4  Device::DrawTriangle(float2 pixelPos, float2 _PixelPos, int firstElementID, void* localVertex)
 {
     float** depthStencilTexture2D = (float**)depthStencil->texture2D;
     if (inputLayout)
     {
-        float3 uvz = GetUVZ(_PixelPos, firstVertexID);
+
+        float3 uvz = GetUVZ(_PixelPos, firstElementID);
         float u = uvz.x;
         float v = uvz.y;
         float z = uvz.z;
@@ -126,18 +140,43 @@ float4  Device::DrawTriangle(float2 pixelPos, float2 _PixelPos, int firstVertexI
                     {
                     case DXGI_FORMAT_R32G32B32_FLOAT:
                     {
-                        float3 elementVertex1 = *(float3*)((char*)changedVertexBuffer.buffer + offset + firstVertexID * changedVertexBuffer.vertexSize);
-                        float3 elementVertex2 = *(float3*)((char*)changedVertexBuffer.buffer + offset + (firstVertexID + 1) * changedVertexBuffer.vertexSize);
-                        float3 elementVertex3 = *(float3*)((char*)changedVertexBuffer.buffer + offset + (firstVertexID + 2) * changedVertexBuffer.vertexSize);
+                        float3 elementVertex1;
+                        float3 elementVertex2;
+                        float3 elementVertex3;
+
+                        if (indexBuffer)
+                        {
+                            elementVertex1 = *(float3*)((char*)changedVertexBuffer.buffer + offset + indexBuffer->buffer[firstElementID] * changedVertexBuffer.vertexSize);
+                            elementVertex2 = *(float3*)((char*)changedVertexBuffer.buffer + offset + indexBuffer->buffer[firstElementID + 1] * changedVertexBuffer.vertexSize);
+                            elementVertex3 = *(float3*)((char*)changedVertexBuffer.buffer + offset + indexBuffer->buffer[firstElementID + 2] * changedVertexBuffer.vertexSize);
+                        }
+                        else
+                        {
+                            elementVertex1 = *(float3*)((char*)changedVertexBuffer.buffer + offset + firstElementID * changedVertexBuffer.vertexSize);
+                            elementVertex2 = *(float3*)((char*)changedVertexBuffer.buffer + offset + (firstElementID + 1) * changedVertexBuffer.vertexSize);
+                            elementVertex3 = *(float3*)((char*)changedVertexBuffer.buffer + offset + (firstElementID + 2) * changedVertexBuffer.vertexSize);
+                        }
                         float3 element = elementVertex1 * (1 - u - v) + elementVertex2 * u + elementVertex3 * v;
                         memcpy((char*)localVertex + offset, &element, sizeof(float3));
                         break;
                     }
                     case DXGI_FORMAT_R32G32B32A32_FLOAT:
                     {
-                        float4 elementVertex1 = *(float4*)((char*)changedVertexBuffer.buffer + offset + firstVertexID * changedVertexBuffer.vertexSize);
-                        float4 elementVertex2 = *(float4*)((char*)changedVertexBuffer.buffer + offset + (firstVertexID + 1) * changedVertexBuffer.vertexSize);
-                        float4 elementVertex3 = *(float4*)((char*)changedVertexBuffer.buffer + offset + (firstVertexID + 2) * changedVertexBuffer.vertexSize);
+                        float4 elementVertex1;
+                        float4 elementVertex2;
+                        float4 elementVertex3;
+                        if (indexBuffer)
+                        {
+                            elementVertex1 = *(float4*)((char*)changedVertexBuffer.buffer + offset + indexBuffer->buffer[firstElementID] * changedVertexBuffer.vertexSize);
+                            elementVertex2 = *(float4*)((char*)changedVertexBuffer.buffer + offset + indexBuffer->buffer[firstElementID + 1] * changedVertexBuffer.vertexSize);
+                            elementVertex3 = *(float4*)((char*)changedVertexBuffer.buffer + offset + indexBuffer->buffer[firstElementID + 2] * changedVertexBuffer.vertexSize);
+                        }
+                        else
+                        {
+                            elementVertex1 = *(float4*)((char*)changedVertexBuffer.buffer + offset + firstElementID * changedVertexBuffer.vertexSize);
+                            elementVertex2 = *(float4*)((char*)changedVertexBuffer.buffer + offset + (firstElementID + 1) * changedVertexBuffer.vertexSize);
+                            elementVertex3 = *(float4*)((char*)changedVertexBuffer.buffer + offset + (firstElementID + 2) * changedVertexBuffer.vertexSize);
+                        }
                         float4 element = elementVertex1 * (1 - u - v) + elementVertex2 * u + elementVertex3 * v;
                         memcpy((char*)localVertex + offset, &element, sizeof(float4));
                         break;
@@ -145,7 +184,7 @@ float4  Device::DrawTriangle(float2 pixelPos, float2 _PixelPos, int firstVertexI
                     }
                 }
 
-                if (firstVertexID == 0)
+                if (firstElementID == 0)
                     int pint = 5;
 
                 float4 color = ps->Execute(localVertex);
@@ -186,6 +225,8 @@ void Device::Draw(int verticesCount)
         int byteCountInVertex = inputLayout->attributeBuffer[inputLayout->elementsCount - 1].offsetInVertex + inputLayout->attributeBuffer[inputLayout->elementsCount - 1].format;
         void* vertex = new char[byteCountInVertex];
 
+        int elementsCount = indexBuffer ? indexBuffer->indexesCount : verticesCount;
+
         for (int x = viewPort.left; x < viewPort.right; x++)
             for (int y = viewPort.top; y < viewPort.bottom; y++)
             {
@@ -193,7 +234,8 @@ void Device::Draw(int verticesCount)
                 float2 _PixelPos = float2{ ((x / width) * 2 - 1) * transfromCoef, ((height - y) / height) * 2 - 1 };
                 float2 pixelPos = float2{ (float)x, (float)y };
                 float4 color{};
-                for (int i = 0; i < verticesCount; i += 3)
+                
+                for (int i = 0; i < elementsCount; i += 3)
                 {
                     float4 tempColor = DrawTriangle(pixelPos, _PixelPos, i, vertex);
                     if(tempColor.w != 0)
@@ -202,6 +244,7 @@ void Device::Draw(int verticesCount)
                     if (color.w != 0)
                         memcpy((char*)(*swapChain)->backBuffers[(*swapChain)->currentBackBufferId].texture2D[x] + (y * (*swapChain)->backBuffers->format), &color, (*swapChain)->backBuffers->format);
             }
+        // v1, v2, v3, v1, v2, v3, v1, v2, v3
 
     }
     else

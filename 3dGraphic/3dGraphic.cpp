@@ -277,16 +277,28 @@ void DrawTriangle(ViewPort viewPort)
     {
         -1, -1, 3,  1, 1, 1, 1,    0, 0, -1,
         0, 1, 3,  1, 1, 1, 1,    0, 0, -1,
-        1, -1, 3,  1, 1, 1, 1,    0, 0, -1,
+        1, -1, 3,  1, 1, 1, 1,    0, 0, -1
     };
-
-    vertexBuffer.buffer = triangle;
+    VERTEX quard[]
+    {
+       -1, -1, 3,  1, 1, 1, 1,    0, 0, -1,
+        -1, 1, 3,  1, 1, 1, 1,    0, 0, -1,
+        1, 1, 3,  1, 1, 1, 1,    0, 0, -1,
+        1, -1, 3,  1, 1, 1, 1,    0, 0, -1
+    };
+    vertexBuffer.buffer = quard;
     vertexBuffer.vertexSize = sizeof(VERTEX);
-    vertexBuffer.verticesCount = sizeof(triangle) / sizeof(VERTEX);
+    vertexBuffer.verticesCount = sizeof(quard) / sizeof(VERTEX);
+
+    //unsigned int indexes[] =
+    //{
+    //    0, 1, 2
+    //};
 
     unsigned int indexes[] =
     {
-        0, 1, 2
+        0, 1, 3,
+        3, 2, 1
     };
 
     indexBuffer.Init(indexes, sizeof(indexes) / sizeof(unsigned int));
@@ -328,7 +340,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         device->SetInputLayout(&inputLayout);
 
         depthStencil.InitTexture2D(DXGI_FORMAT_R32_FLOAT, float2{ width, height });
-
     }
     case WM_COMMAND:
     {
@@ -370,9 +381,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         device->ClearBuffer(float4{ 117.0f / 255, 165.0f / 255, 231.0f / 255, 1 }, &swapChain->backBuffers[swapChain->currentBackBufferId]);
         device->SetDepthStencil(&depthStencil);
-        //DrawCube({ 3, -4, 8 }, viewPort);
-        //DrawCube({ 2, -3, 9 }, viewPort);
-        DrawTriangle(viewPort);
+        DrawCube({ 3, -4, 8 }, viewPort);
+        DrawCube({ 2, -3, 9 }, viewPort);
+        //DrawTriangle(viewPort);
 
         swapChain->Prevent();
 
