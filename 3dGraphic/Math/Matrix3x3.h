@@ -99,5 +99,23 @@ public:
 
 		*matrix = tempMatrix * (*matrix);
 	}
+
+	void RotateZ(Matrix3x3* matrix, float angle)
+	{
+		Matrix3x3 tempMatrix{};
+		tempMatrix.a11 = cos(angle);
+		tempMatrix.a12 = -sin(angle);
+		tempMatrix.a13 = 0;
+
+		tempMatrix.a21 = sin(angle);
+		tempMatrix.a22 = cos(angle);
+		tempMatrix.a23 = 0;
+
+		tempMatrix.a31 = 0;
+		tempMatrix.a32 = 0;
+		tempMatrix.a33 = 1;
+
+		*matrix = tempMatrix * (*matrix);
+	}
 };
 

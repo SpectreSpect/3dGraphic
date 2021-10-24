@@ -28,11 +28,5 @@ public:
 	//Input input;
 	virtual void* Execute(void* vertexBuffer, int vertexOffeset) override;
 	Output* main(Input input);
-
-private:
-	void rotOx(Matrix3x3* matrix, float alpha);
-	void rotOy(Matrix3x3* matrix, float alpha);
-	void rotOz(Matrix3x3* matrix, float alpha);
-	//void rot(float3* vec, float alpha);
 };
 

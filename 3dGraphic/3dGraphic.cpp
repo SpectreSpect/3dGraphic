@@ -203,6 +203,98 @@ struct StructuredBuffer
     float3 objPos;
 };
 
+class Cube
+{
+public:
+    float3 pos{};
+    Matrix3x3 rotationMatrix{};
+    Cube()
+    {
+        VERTEX vertices[] =
+        {
+            //bottom
+            -1, -1, -1,  1, 1, 1, 1,    0, -1, 0,
+            -1, -1, 1,  1, 1, 1, 1,     0, -1, 0,
+            1 , -1, -1,  1, 1, 1, 1,     0, -1, 0,
+
+
+            1, -1, -1,  1, 1, 1, 1,     0, -1, 0,
+            1, -1, 1,  1, 1, 1, 1,      0, -1, 0,
+            -1, -1, 1,  1, 1, 1, 1,     0, -1, 0,
+
+            //left
+             -1, -1, 1,  1, 1, 1, 1,     -1, 0, 0,
+             -1, 1, 1,  1, 1, 1, 1,      -1, 0, 0,
+             -1, 1, -1,  1, 1, 1, 1,     -1, 0, 0,
+
+             -1, 1, -1,  1, 1, 1, 1,     -1, 0, 0,
+             -1, -1, -1,  1, 1, 1, 1,    -1, 0, 0,
+             -1, -1, 1,  1, 1, 1, 1,     -1, 0, 0,
+
+             //back
+              -1, -1, 1,  1, 1, 1, 1,      0, 0, 1,
+              -1, 1, 1,  1, 1, 1, 1,       0, 0, 1,
+              1, 1, 1,  1, 1, 1, 1,        0, 0, 1,
+
+              1, 1, 1,  1, 1, 1, 1,        0, 0, 1,
+              -1, -1, 1,  1, 1, 1, 1,      0, 0, 1,
+              1, -1, 1,  1, 1, 1, 1,       0, 0, 1,
+
+              //right
+               1, -1, 1,  1, 1, 1, 1,      1, 0, 0,
+               1, -1, -1,  1, 1, 1, 1,     1, 0, 0,
+               1, 1, -1,  1, 1, 1, 1,      1, 0, 0,
+
+               1, 1, -1,  1, 1, 1, 1,      0, 0, 0,
+               1, -1, 1,  1, 1, 1, 1,      1, 0, 0,
+               1, 1, 1,  1, 1, 1, 1,       1, 0, 0,
+
+               //top
+                1, 1, 1,  1, 1, 1, 1, 0, 1, 0,
+                -1, 1, 1,  1, 1, 1, 1, 0, 1, 0,
+                -1, 1, -1,  1, 1, 1, 1, 0, 1, 0,
+
+               -1, 1, -1,  1, 1, 1, 1, 0, 1, 0,
+               1, 1, 1,  1, 1, 1, 1, 0, 1, 0,
+               1, 1, -1,  1, 1, 1, 1, 0, 1, 0,
+
+               //front
+                  1, 1, -1,  1, 1, 1, 1, 0, 0, -1,
+                  -1, 1, -1,  1, 1, 1, 1,  0, 0, -1,
+                  -1, -1, -1,  1, 1, 1, 1,  0, 0, -1,
+
+                  -1, -1, -1,  1, 1, 1, 1,  0, 0, -1,
+                  1, -1, -1,  1, 1, 1, 1,  0, 0, -1,
+                  1, 1, -1,  1, 1, 1, 1,  0, 0, -1,
+        };
+
+        cubeVertexBuffer.vertexSize = sizeof(VERTEX);
+        cubeVertexBuffer.verticesCount = sizeof(vertices) / sizeof(VERTEX);
+
+        this->vertices = new VERTEX[cubeVertexBuffer.verticesCount];
+        for (int i = 0; i < cubeVertexBuffer.verticesCount; i++)
+            this->vertices[i] = vertices[i];
+
+        cubeVertexBuffer.buffer = this->vertices;
+
+    }
+    void Draw(Device** device)
+    {
+        structuredBuffer.objPos = pos;
+        structuredBuffer.rotationMatrix = rotationMatrix;
+        (*device)->SetStructuredBuffer(&structuredBuffer);
+        (*device)->SetVertexBuffer(&cubeVertexBuffer);
+        (*device)->SetVertexShader(&testVS);
+        (*device)->SetPixelShader(&testPS);
+        (*device)->Draw(cubeVertexBuffer.verticesCount);
+    }
+private:
+    VertexBuffer cubeVertexBuffer;
+    VERTEX* vertices;
+    StructuredBuffer structuredBuffer;
+
+};
+
 VERTEX* DrawCube(float3 pos, ViewPort viewPort)
 {
     //float3 pos = { 3, -4, 8 };
@@ -273,13 +365,13 @@ VERTEX* DrawCube(float3 pos, ViewPort viewPort)
 
     rotationMatrix.RotateX(&rotationMatrix, 3.14f / 3);
     rotationMatrix.RotateY(&rotationMatrix, 3.14f / 4 - 0.3f);
+    //rotationMatrix.RotateZ(&rotationMatrix, 3.14f / 4 - 0.3f);
 
     StructuredBuffer structuredBuffer;
     structuredBuffer.objPos = { 0, 0, 6 };
     structuredBuffer.rotationMatrix = rotationMatrix;
 
     device->SetStructuredBuffer(&structuredBuffer);
-    device->SetViewPort(viewPort);
     device->SetVertexBuffer(&vertexBuffer);
     device->SetVertexShader(&testVS);
     device->SetPixelShader(&testPS);
@@ -335,6 +427,8 @@ void DrawTriangle(ViewPort viewPort)
     device->Draw(vertexBuffer.verticesCount);
 }
 
+Cube cube;
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
@@ -363,6 +457,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         device->SetInputLayout(&inputLayout);
 
         depthStencil.InitTexture2D(DXGI_FORMAT_R32_FLOAT, float2{ width, height });
+
+        Matrix3x3 rotationMatrix;
+        rotationMatrix.MakeUnit();
+
+        rotationMatrix.RotateX(&rotationMatrix, 3.14f / 3);
+        rotationMatrix.RotateY(&rotationMatrix, 3.14f / 4 - 0.3f);
+        //rotationMatrix.RotateZ(&rotationMatrix, 3.14f / 4 - 0.3f);
+
+        cube.pos = {0, 0, 6};
+        cube.rotationMatrix = rotationMatrix;
     }
     case WM_COMMAND:
     {
@@ -398,15 +502,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         viewPort.right = clientRect.right;
         viewPort.bottom = clientRect.bottom;
 
-
-
-
+        device->SetViewPort(viewPort);
 
         device->ClearBuffer(float4{ 117.0f / 255, 165.0f / 255, 231.0f / 255, 1 }, &swapChain->backBuffers[swapChain->currentBackBufferId]);
         device->SetDepthStencil(&depthStencil);
-        DrawCube({ 0, 0, 0 }, viewPort);
-        //DrawCube({ 2, -3, 9 }, viewPort);
-        //DrawTriangle(viewPort);
+
+        cube.Draw(&device);
+        cube.pos = { 1, 0, 6 };
+
+        cube.Draw(&device);
 
         swapChain->Prevent();
 
