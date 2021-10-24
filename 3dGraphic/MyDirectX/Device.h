@@ -27,8 +27,10 @@ public:
 	void CreateSwapChain(SwapChain** swapChain, int backBuffersCount, float2 backBuffersSize, DXGI_FORMAT format);
 	void SetDepthStencil(Texture2D* depthStencil);
 	void SetIndexBuffer(IndexBuffer* indexBuffer);
+	void SetStructuredBuffer(void* buffer);
 	void Draw(int verticesCount);
 	void ClearBuffer(float4 color, Texture2D* texture);
+
 	SwapChain** swapChain;
 private:
 	VertexShader* vs;
@@ -39,6 +41,7 @@ private:
 	Input_Layout* inputLayout;
 	Texture2D* depthStencil;
 	IndexBuffer* indexBuffer;
+	void* structuredBuffer;
 
 	void* backBuffers;
 	void* videoHashMemory;

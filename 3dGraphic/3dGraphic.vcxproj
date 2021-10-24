@@ -140,6 +140,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="3dGraphic.h" />
+    <ClInclude Include="Math\Matrix3x3.h" />
     <ClInclude Include="MyDirectX\IndexBuffer.h" />
     <ClInclude Include="MyDirectX\DepthStencil.h" />
     <ClInclude Include="MyDirectX\Input_Layout.h" />

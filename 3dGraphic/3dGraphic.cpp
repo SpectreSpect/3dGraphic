@@ -196,6 +196,13 @@ struct VERTEX
     float3 normal;
 };
 
+
+struct StructuredBuffer
+{
+    Matrix3x3 rotationMatrix;
+    float3 objPos;
+};
+
 VERTEX* DrawCube(float3 pos, ViewPort viewPort)
 {
     //float3 pos = { 3, -4, 8 };
@@ -261,6 +268,17 @@ VERTEX* DrawCube(float3 pos, ViewPort viewPort)
     vertexBuffer.vertexSize = sizeof(VERTEX);
     vertexBuffer.verticesCount = sizeof(vertices) / sizeof(VERTEX);
 
+    Matrix3x3 rotationMatrix;
+    rotationMatrix.MakeUnit();
+
+    rotationMatrix.RotateX(&rotationMatrix, 3.14f / 3);
+    rotationMatrix.RotateY(&rotationMatrix, 3.14f / 4 - 0.3f);
+
+    StructuredBuffer structuredBuffer;
+    structuredBuffer.objPos = { 0, 0, 6 };
+    structuredBuffer.rotationMatrix = rotationMatrix;
+
+    device->SetStructuredBuffer(&structuredBuffer);
     device->SetViewPort(viewPort);
     device->SetVertexBuffer(&vertexBuffer);
     device->SetVertexShader(&testVS);
@@ -303,6 +321,11 @@ void DrawTriangle(ViewPort viewPort)
 
     indexBuffer.Init(indexes, sizeof(indexes) / sizeof(unsigned int));
 
+    Matrix3x3 rotationMatrix;
+
+
+
+
     device->SetViewPort(viewPort);
     device->SetVertexBuffer(&vertexBuffer);
     device->SetIndexBuffer(&indexBuffer);
@@ -332,7 +355,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         attribute[0] = { (char*)"POSITION", DXGI_FORMAT_R32G32B32_FLOAT, 0 };
         attribute[1] = { (char*)"COLOR", DXGI_FORMAT_R32G32B32A32_FLOAT, 12 };
         attribute[2] = { (char*)"NORMAL", DXGI_FORMAT_R32G32B32_FLOAT, 28 };
-
+        
 
         inputLayout.attributeBuffer = attribute;
         inputLayout.elementsCount = 3;
@@ -381,8 +404,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         device->ClearBuffer(float4{ 117.0f / 255, 165.0f / 255, 231.0f / 255, 1 }, &swapChain->backBuffers[swapChain->currentBackBufferId]);
         device->SetDepthStencil(&depthStencil);
-        DrawCube({ 3, -4, 8 }, viewPort);
-        DrawCube({ 2, -3, 9 }, viewPort);
+        DrawCube({ 0, 0, 0 }, viewPort);
+        //DrawCube({ 2, -3, 9 }, viewPort);
         //DrawTriangle(viewPort);
 
         swapChain->Prevent();

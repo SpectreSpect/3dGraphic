@@ -1,5 +1,6 @@
 #pragma once
 #include "MyDirectX/PixelShader.h"
+#include "Math/Matrix3x3.h"
 
 class TestPS : public PixelShader
 {
@@ -10,6 +11,11 @@ public:
 		float4 color;
 		float3 normal;
 	};
+	struct StructuredBuffer
+	{
+		Matrix3x3 transformMatrix;
+	};
+	StructuredBuffer* structuredBuffer;
 	virtual float4 Execute(void* input) override;
 	float4 main(Input input);
 

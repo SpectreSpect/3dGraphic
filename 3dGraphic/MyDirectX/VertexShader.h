@@ -8,5 +8,6 @@ public:
 	void FillStruct(void* data);
 	virtual void* Execute(void* vertexBuffer, int vertexOffeset) = 0;
 	VertexBuffer* vertexBuffer;
+	void* pVoidStructuredBuffer;
 };
 

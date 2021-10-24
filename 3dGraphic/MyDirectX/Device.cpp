@@ -64,6 +64,11 @@ void Device::SetIndexBuffer(IndexBuffer* indexBuffer)
     this->indexBuffer = indexBuffer;
 }
 
+void Device::SetStructuredBuffer(void* buffer)
+{
+    structuredBuffer = buffer;
+}
+
 float3 Device::GetUVZ(float2 pixelPos, int firstVertexID)
 {
 
@@ -210,12 +215,15 @@ void Device::Draw(int verticesCount)
     if (swapChain)
     {
         if (vs)
+        {
+            vs->pVoidStructuredBuffer = structuredBuffer;
             for (int i = 0; i < verticesCount; i++)
             {
                 void* output = vs->Execute(vertexBuffer->buffer, i * vertexBuffer->vertexSize);
                 int idInVertexBuffer = i * changedVertexBuffer.vertexSize;
                 memcpy((char*)changedVertexBuffer.buffer + idInVertexBuffer, output, changedVertexBuffer.vertexSize);
             }
+        }
         else
             throw;
 
