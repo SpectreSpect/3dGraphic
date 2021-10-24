@@ -13,3 +13,4 @@ And that's how looks my linker and General:
 For some reasons the project works only with x64 Debug:
 ![image](https://user-images.githubusercontent.com/52841087/138603754-220fedc6-598c-4e81-934a-beefb3529e7c.png)
 
+And, at the end, it require to put dll file in the same folder where are .exe file (it is descripted in the site I put before)
