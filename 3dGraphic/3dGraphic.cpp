@@ -1,14 +1,29 @@
 ﻿// 3dGraphic.cpp : Определяет точку входа для приложения.
 //
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 
 #include "framework.h"
 #include "3dGraphic.h"
 #include "Math/mymath.h"
 #include "MyDirectX/Device.h"
 
+
+
 #include "TestVS.h"
 #include "TestPS.h"
 #include "MyDirectX/Input_Layout.h"
+
+
+//#include "../Include/assimp/Importer.hpp"
+//#include "../Include/assimp/scene.h"
+//#include "../Include/assimp/postprocess.h"
+
+//#pragma comment (lib, "assimp-vc143-mtd.lib")
+
+
+
 
 #define MAX_LOADSTRING 100
 #define VIDEOCASHMEMORYSIZE 100000000
@@ -297,6 +312,7 @@ private:
 
 VERTEX* DrawCube(float3 pos, ViewPort viewPort)
 {
+    //Assimp::Importer importer;
     //float3 pos = { 3, -4, 8 };
     VERTEX vertices[] =
     {
@@ -487,6 +503,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     break;
     case WM_PAINT:
     {
+
         PAINTSTRUCT ps;
         HDC hdc = BeginPaint(hWnd, &ps);
 
@@ -503,6 +520,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         viewPort.bottom = clientRect.bottom;
 
         device->SetViewPort(viewPort);
+
+
 
         device->ClearBuffer(float4{ 117.0f / 255, 165.0f / 255, 231.0f / 255, 1 }, &swapChain->backBuffers[swapChain->currentBackBufferId]);
         device->SetDepthStencil(&depthStencil);

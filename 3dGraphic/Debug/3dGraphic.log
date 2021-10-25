@@ -1,6 +1,6 @@
 ﻿  3dGraphic.cpp
-E:\VisualStudioProjects\3dGraphic\3dGraphic\3dGraphic.cpp(416,15): warning C4101: rotationMatrix: неиспользованная локальная переменная
-E:\VisualStudioProjects\3dGraphic\3dGraphic\3dGraphic.cpp(441,21): warning C4244: инициализация: преобразование "LONG" в "float", возможна потеря данных
-E:\VisualStudioProjects\3dGraphic\3dGraphic\3dGraphic.cpp(442,22): warning C4244: инициализация: преобразование "LONG" в "float", возможна потеря данных
-E:\VisualStudioProjects\3dGraphic\3dGraphic\3dGraphic.cpp(381): warning C4172: возвращение адреса локальной или временной переменной : vertices
+E:\VisualStudioProjects\3dGraphic\3dGraphic\3dGraphic.cpp(435,15): warning C4101: rotationMatrix: неиспользованная локальная переменная
+E:\VisualStudioProjects\3dGraphic\3dGraphic\3dGraphic.cpp(460,21): warning C4244: инициализация: преобразование "LONG" в "float", возможна потеря данных
+E:\VisualStudioProjects\3dGraphic\3dGraphic\3dGraphic.cpp(461,22): warning C4244: инициализация: преобразование "LONG" в "float", возможна потеря данных
+E:\VisualStudioProjects\3dGraphic\3dGraphic\3dGraphic.cpp(400): warning C4172: возвращение адреса локальной или временной переменной : vertices
   3dGraphic.vcxproj -> E:\VisualStudioProjects\3dGraphic\Debug\3dGraphic.exe
