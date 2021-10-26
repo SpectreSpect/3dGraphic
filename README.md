@@ -1,7 +1,10 @@
 # 3dGraphic
 In this project I tried to create 3d graphic using winAPI without any graphical libraries such as directX, vulcan and so on. The syntax in this program is similar to the syntax in dirextX 11.
 
+![image](https://user-images.githubusercontent.com/52841087/138960919-2478c344-594e-4e52-a382-a8d313b29ab7.png)
 ![image](https://user-images.githubusercontent.com/52841087/136666043-6371fd3a-244a-43c3-85bd-e04cc102e169.png)
+
+
 
 
 For downloading assimp I used this site: https://ravesli.com/urok-16-biblioteka-importa-3d-modelej-assimp-v-opengl/#toc-3
