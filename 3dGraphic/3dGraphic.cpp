@@ -15,7 +15,7 @@
 #include "TestPS.h"
 #include "MyDirectX/Input_Layout.h"
 
-
+#include "MyDirectX/Model.h"
 //#include "../Include/assimp/Importer.hpp"
 //#include "../Include/assimp/scene.h"
 //#include "../Include/assimp/postprocess.h"
@@ -444,7 +444,7 @@ void DrawTriangle(ViewPort viewPort)
 }
 
 Cube cube;
-
+Model* monkeyModel;
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
@@ -460,15 +460,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         device = new Device(VIDEOCASHMEMORYSIZE);
         device->CreateSwapChain(&swapChain, 2, float2{ width, height }, DXGI_FORMAT_R32G32B32A32_FLOAT);
 
-        Attribute* attribute = new Attribute[3];
+        Attribute* attribute = new Attribute[2];
 
         attribute[0] = { (char*)"POSITION", DXGI_FORMAT_R32G32B32_FLOAT, 0 };
-        attribute[1] = { (char*)"COLOR", DXGI_FORMAT_R32G32B32A32_FLOAT, 12 };
-        attribute[2] = { (char*)"NORMAL", DXGI_FORMAT_R32G32B32_FLOAT, 28 };
+        //attribute[1] = { (char*)"COLOR", DXGI_FORMAT_R32G32B32A32_FLOAT, 12 };
+        attribute[1] = { (char*)"NORMAL", DXGI_FORMAT_R32G32B32_FLOAT, 12 };
         
 
         inputLayout.attributeBuffer = attribute;
-        inputLayout.elementsCount = 3;
+        inputLayout.elementsCount = 2;
 
         device->SetInputLayout(&inputLayout);
 
@@ -477,12 +477,35 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         Matrix3x3 rotationMatrix;
         rotationMatrix.MakeUnit();
 
-        rotationMatrix.RotateX(&rotationMatrix, 3.14f / 3);
-        rotationMatrix.RotateY(&rotationMatrix, 3.14f / 4 - 0.3f);
+        rotationMatrix.RotateY(&rotationMatrix, 3.14f);
+        rotationMatrix.RotateX(&rotationMatrix, 3.14f / 2);
         //rotationMatrix.RotateZ(&rotationMatrix, 3.14f / 4 - 0.3f);
 
         cube.pos = {0, 0, 6};
         cube.rotationMatrix = rotationMatrix;
+
+        monkeyModel = new Model("../models/Monkey.obj");
+
+        monkeyModel->rotationMatrix = rotationMatrix;
+        monkeyModel->position = {0, 0, 2};
+
+
+        //std::vector<int> test;
+
+        //test.push_back(1);
+        //test.push_back(2);
+
+        //int* ptest = new int[2];
+
+        //ptest = (int*)&test[0];
+        //int point = 0;
+        //for (int i = 0; i < 2; i++)
+        //{
+        //    point = ptest[i];
+        //    int k = 0;
+        //}
+
+
     }
     case WM_COMMAND:
     {
@@ -526,10 +549,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         device->ClearBuffer(float4{ 117.0f / 255, 165.0f / 255, 231.0f / 255, 1 }, &swapChain->backBuffers[swapChain->currentBackBufferId]);
         device->SetDepthStencil(&depthStencil);
 
-        cube.Draw(&device);
-        cube.pos = { 1, 0, 6 };
+        //cube.Draw(&device);
+        //cube.pos = { 1, 0, 6 };
 
-        cube.Draw(&device);
+        //cube.Draw(&device);
+
+        monkeyModel->Draw(device, &testVS, &testPS );
 
         swapChain->Prevent();
 

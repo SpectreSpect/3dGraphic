@@ -87,6 +87,12 @@
     <ClInclude Include="Math\Matrix3x3.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
+    <ClInclude Include="MyDirectX\Mesh.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="MyDirectX\Model.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="3dGraphic.cpp">
@@ -126,6 +132,12 @@
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="MyDirectX\IndexBuffer.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="MyDirectX\Mesh.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="MyDirectX\Model.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>

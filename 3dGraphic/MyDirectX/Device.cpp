@@ -189,9 +189,6 @@ float4  Device::DrawTriangle(float2 pixelPos, float2 _PixelPos, int firstElement
                     }
                 }
 
-                if (firstElementID == 0)
-                    int pint = 5;
-
                 float4 color = ps->Execute(localVertex);
                 return color;
             }

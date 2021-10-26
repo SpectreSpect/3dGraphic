@@ -153,6 +153,8 @@
   <ItemGroup>
     <ClInclude Include="3dGraphic.h" />
     <ClInclude Include="Math\Matrix3x3.h" />
+    <ClInclude Include="MyDirectX\Model.h" />
+    <ClInclude Include="MyDirectX\Mesh.h" />
     <ClInclude Include="MyDirectX\IndexBuffer.h" />
     <ClInclude Include="MyDirectX\DepthStencil.h" />
     <ClInclude Include="MyDirectX\Input_Layout.h" />
@@ -178,6 +180,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="3dGraphic.cpp" />
+    <ClCompile Include="MyDirectX\Model.cpp" />
+    <ClCompile Include="MyDirectX\Mesh.cpp" />
     <ClCompile Include="MyDirectX\IndexBuffer.cpp" />
     <ClCompile Include="MyDirectX\DepthStencil.cpp" />
     <ClCompile Include="MyDirectX\Input_Layout.cpp" />

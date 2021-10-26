@@ -8,7 +8,7 @@ public:
 	struct Input
 	{
 		float3 pos;
-		float4 color;
+		//float4 color;
 		float3 normal;
 	};
 	struct StructuredBuffer

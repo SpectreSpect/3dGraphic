@@ -11,8 +11,10 @@ TestVS::Output* TestVS::main(Input input)
 	Output output;
 
 	output.pos = (structuredBuffer->rotationMatrix * float3{ input.pos.x, input.pos.y, input.pos.z }) + structuredBuffer->objPos;
-	output.color = input.color;
+	//output.pos = float3{ input.pos.x, input.pos.y, input.pos.z } + float3{0, -1, 7};
+	//output.color = input.color;
 	output.normal = structuredBuffer->rotationMatrix * input.normal;
+	//output.normal = input.normal;
 
 	return &output;
 }
